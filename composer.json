@@ -1,0 +1,19 @@
+{
+    "name": "kelunik/bugs",
+    "description": "A modern issue tracker.",
+    "type": "project",
+    "require": {
+        "amphp/aerys": "^0.3.0",
+        "amphp/aerys-session": "^0.1.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Niklas Keller",
+            "email": "me@kelunik.com"
+        }
+    ]
+}
