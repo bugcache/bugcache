@@ -10,7 +10,8 @@ use Amp as amp;
 class BugManager implements aerys\ServerObserver, aerys\Bootable {
 	private $db;
 	private $submit;
-	private $list;
+	private $listDesc;
+	private $listAsc;
 	private $fetchBug;
 	private $delete;
 	
@@ -26,7 +27,8 @@ class BugManager implements aerys\ServerObserver, aerys\Bootable {
 		if ($server->state() == Server::STARTING) {
 			return amp\all([
 				"submit" => $this->db->prepare("INSERT INTO bugs (title, data) VALUES (:title, :data)"),
-				"list" => $this->db->prepare("SELECT id, title FROM bugs ORDER BY id DESC LIMIT ? OFFSET ?"),
+				"listDesc" => $this->db->prepare("SELECT id, title FROM bugs WHERE id < ? ORDER BY id DESC LIMIT ?"),
+				"listAsc" => $this->db->prepare("SELECT id, title FROM bugs WHERE id > ? ORDER BY id ASC LIMIT ?"),
 				"fetchBug" => $this->db->prepare("SELECT title, data FROM bugs WHERE id = ?"),
 				"delete" => $this->db->prepare("DELETE FROM bugs WHERE id = ?"),
 			])->when(function($e, $data) {
@@ -56,11 +58,25 @@ class BugManager implements aerys\ServerObserver, aerys\Bootable {
 		return ["id" => $info->insertId];
 	}
 	
+	public function recent(Request $req) {
+		$num = (int) ($req->getParam("num") ?? 100);
+
+		$result = yield $this->listDesc->execute([PHP_INT_MAX, $num]);
+
+		return yield $result->fetchObjects();
+	}
+	
 	public function list(Request $req) {
 		$num = (int) ($req->getParam("num") ?? 100);
-		$offset = (int) ($req->getParam("offset") ?? 0);
+		$last = (int) ($req->getParam("last") ?? 0);
 		
-		$result = yield $this->list->execute([$num, $offset]);
+		if ($req->getParam("order") == "desc") {
+			$stmt = $this->listDesc;
+		} else {
+			$stmt = $this->listAsc;
+		}
+		
+		$result = yield $stmt->execute([$last, $num]);
 
 		return yield $result->fetchObjects();
 	}
