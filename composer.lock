@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a8d9d627024865066021950a3543d32a",
-    "content-hash": "b244ce10243c78f3aed03999ddfd4e57",
+    "hash": "ee03cee7ce741e0b5faf12e8d3e763bc",
+    "content-hash": "6e14f332c56c88cb7592110261b9013d",
     "packages": [
         {
             "name": "amphp/aerys",
-            "version": "v0.4.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/aerys.git",
-                "reference": "a8401c938e067c598a6bc1d7989d6047e0001db7"
+                "reference": "74e88cd72e42cc55166ec5d8bf9b5b3037998f35"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/aerys/zipball/a8401c938e067c598a6bc1d7989d6047e0001db7",
-                "reference": "a8401c938e067c598a6bc1d7989d6047e0001db7",
+                "url": "https://api.github.com/repos/amphp/aerys/zipball/74e88cd72e42cc55166ec5d8bf9b5b3037998f35",
+                "reference": "74e88cd72e42cc55166ec5d8bf9b5b3037998f35",
                 "shasum": ""
             },
             "require": {
@@ -34,7 +34,7 @@
                 "amphp/artax": "^2",
                 "fabpot/php-cs-fixer": "^1.9",
                 "http2jp/hpack-test-case": "1.0",
-                "phpunit/phpunit": "^5"
+                "phpunit/phpunit": "~5.2.12"
             },
             "bin": [
                 "bin/aerys"
@@ -85,7 +85,7 @@
                 "server",
                 "websocket"
             ],
-            "time": "2016-04-01 14:33:52"
+            "time": "2016-04-06 17:02:45"
         },
         {
             "name": "amphp/aerys-session",
@@ -368,16 +368,16 @@
         },
         {
             "name": "amphp/mysql",
-            "version": "v0.1.0",
+            "version": "v0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/mysql.git",
-                "reference": "4d10b75d62852d718556cd32b826efe516892877"
+                "reference": "c3fd01b11b4b77c7666caae55e6bae1b21a61e53"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/mysql/zipball/4d10b75d62852d718556cd32b826efe516892877",
-                "reference": "4d10b75d62852d718556cd32b826efe516892877",
+                "url": "https://api.github.com/repos/amphp/mysql/zipball/c3fd01b11b4b77c7666caae55e6bae1b21a61e53",
+                "reference": "c3fd01b11b4b77c7666caae55e6bae1b21a61e53",
                 "shasum": ""
             },
             "require": {
@@ -401,7 +401,7 @@
                 }
             ],
             "description": "Asynchronous parallel Mysql client built on the Amp concurrency framework",
-            "time": "2015-11-07 08:58:05"
+            "time": "2016-04-05 22:35:44"
         },
         {
             "name": "amphp/redis",
@@ -454,16 +454,16 @@
         },
         {
             "name": "amphp/socket",
-            "version": "v0.9.6",
+            "version": "v0.9.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/socket.git",
-                "reference": "df744e08957cc7023bd9a1401d2a42bd5e9f771a"
+                "reference": "aa784fe3a18fa8514e57714142488f629073c7a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/socket/zipball/df744e08957cc7023bd9a1401d2a42bd5e9f771a",
-                "reference": "df744e08957cc7023bd9a1401d2a42bd5e9f771a",
+                "url": "https://api.github.com/repos/amphp/socket/zipball/aa784fe3a18fa8514e57714142488f629073c7a9",
+                "reference": "aa784fe3a18fa8514e57714142488f629073c7a9",
                 "shasum": ""
             },
             "require": {
@@ -505,7 +505,7 @@
                 "tcp",
                 "tls"
             ],
-            "time": "2016-04-01 18:49:05"
+            "time": "2016-04-06 16:38:57"
         },
         {
             "name": "daverandom/libdns",
@@ -628,6 +628,52 @@
                 "terminal"
             ],
             "time": "2016-04-04 20:24:59"
+        },
+        {
+            "name": "mustache/mustache",
+            "version": "v2.10.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bobthecow/mustache.php.git",
+                "reference": "0bb2f76e2f34a8864a32be34c4ec66274d76c05e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bobthecow/mustache.php/zipball/0bb2f76e2f34a8864a32be34c4ec66274d76c05e",
+                "reference": "0bb2f76e2f34a8864a32be34c4ec66274d76c05e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2.4"
+            },
+            "require-dev": {
+                "fabpot/php-cs-fixer": "~1.6",
+                "phpunit/phpunit": "~3.7|~4.0|~5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Mustache": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Justin Hileman",
+                    "email": "justin@justinhileman.info",
+                    "homepage": "http://justinhileman.com"
+                }
+            ],
+            "description": "A Mustache implementation in PHP.",
+            "homepage": "https://github.com/bobthecow/mustache.php",
+            "keywords": [
+                "mustache",
+                "templating"
+            ],
+            "time": "2016-02-27 19:22:46"
         },
         {
             "name": "mustache/mustache",
@@ -1947,9 +1993,18 @@
             "time": "2016-03-04 07:55:57"
         }
     ],
-    "aliases": [],
+    "aliases": [
+        {
+            "alias": "0.4.2",
+            "alias_normalized": "0.4.2.0",
+            "version": "9999999-dev",
+            "package": "amphp/aerys"
+        }
+    ],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "amphp/aerys": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
