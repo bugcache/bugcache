@@ -35,7 +35,5 @@ class UserRepository implements Storage\UserRepository {
                 "name" => "anonymous",
             ];
         }
-
-        throw new Storage\NoRecordException;
     }
 }
