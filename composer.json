@@ -5,7 +5,8 @@
     "require": {
         "amphp/aerys": "^0.4.0",
         "amphp/aerys-session": "^0.1.2",
-        "amphp/mysql": "^0.1.0"
+        "amphp/mysql": "^0.1.0",
+        "mustache/mustache": "^2.10"
     },
     "autoload": {
         "psr-4": {

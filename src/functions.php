@@ -22,7 +22,11 @@ function jsonify(callable $handler) {
 		}
 		
 		function __invoke(aerys\Request $req, aerys\Response $res, $routerData = []) {
-			$data = yield from ($this->handler)($req, $routerData);
+			$data = ($this->handler)($req, $routerData);
+
+			if ($data instanceof \Generator) {
+				$data = yield from $data;
+			}
 
 			$res->setHeader("content-type", "application/json");
 			if ($data === null) {
