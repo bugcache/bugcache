@@ -11,7 +11,7 @@ class Mustache {
         $this->mustacheEngine = $mustacheEngine;
     }
 
-    public function render(string $content, $context = []) {
-        return $this->mustacheEngine->render($content, $context);
+    public function render(string $filename, $context = []) {
+        return $this->mustacheEngine->render($filename, $context);
     }
 }

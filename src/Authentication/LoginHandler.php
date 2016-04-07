@@ -8,10 +8,7 @@ use Aerys\ParsedBody;
 use Aerys\Request;
 use Aerys\Response;
 use Aerys\Server;
-use Aerys\ServerObserver;
 use Aerys\Session;
-use Amp\Promise;
-use Amp\Success;
 use Bugcache\Mustache;
 use Bugcache\SessionKeys;
 use Bugcache\Storage\AuthenticationRepository;
@@ -19,10 +16,7 @@ use Bugcache\Storage\UserRepository;
 use function Aerys\parseBody;
 use function Amp\resolve;
 
-class LoginHandler implements Bootable, ServerObserver {
-    const TEMPLATE_LOGIN = "login";
-
-    private $templates = [];
+class LoginHandler implements Bootable {
     private $userRepository;
     private $authenticationRepository;
     private $mustacheEngine;
@@ -40,32 +34,6 @@ class LoginHandler implements Bootable, ServerObserver {
 
     public function boot(Server $server, Logger $logger) {
         $this->logger = $logger;
-        $server->attach($this);
-    }
-
-    public function update(Server $server): Promise {
-        if ($server->state() === Server::STARTING) {
-            return $this->loadTemplates();
-        }
-
-        return new Success;
-    }
-
-    private function loadTemplates() {
-        $templates = [
-            self::TEMPLATE_LOGIN => "login.html",
-        ];
-
-        $templates = array_map(function($path) {
-            return __DIR__ . "/../../res/templates/{$path}";
-        }, $templates);
-
-        return \Amp\all(array_map("Amp\\File\\get", $templates))->when(function ($error, $templates) {
-            if (!$error) {
-                $this->logger->debug("Successfully loaded templates.");
-                $this->templates = $templates;
-            }
-        });
     }
 
     public function showLogin(Request $request, Response $response) {
@@ -80,7 +48,8 @@ class LoginHandler implements Bootable, ServerObserver {
             return;
         }
 
-        $content = $this->mustacheEngine->render($this->templates[self::TEMPLATE_LOGIN]);
+        $content = $this->mustacheEngine->render("login.mustache");
+
         $response->end($content);
     }
 

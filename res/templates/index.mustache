@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bugcache</title>
+</head>
+<body>
+    {{#meta.user.id}}
+        <form action="/logout" method="POST">
+            <button type="submit">
+                Logout
+            </button>
+        </form>
+    {{/meta.user.id}}
+
+    {{^meta.user.id}}
+        <a href="/login">
+            Login
+        </a>
+    {{/meta.user.id}}
+
+    <a href="/recent">List recent bugs</a>
+</body>
+</html>

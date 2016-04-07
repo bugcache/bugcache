@@ -3,22 +3,31 @@
 namespace Bugcache;
 
 use Aerys\{ Request, Response };
+use Aerys\Session;
 
 class BugDisplay {
 	private $manager;
 	private $mustache;
 
-	public function __construct(BugManager $manager, \Mustache_Engine $mustache) {
+	public function __construct(BugManager $manager, Mustache $mustache) {
 		$this->manager = $manager;
 		$this->mustache = $mustache;
 	}
-	
+
 	public function index() {
 		return function(Request $req, Response $res) {
-			$res->end($this->mustache->render("index.mustache"));
+			$session = yield (new Session($req))->read();
+
+			$res->end($this->mustache->render("index.mustache", (object) [
+				"meta" => (object) [
+					"user" => (object) [
+						"id" => $session->get(SessionKeys::LOGIN) ?? 0,
+					],
+				],
+			]));
 		};
 	}
-	
+
 	public function recent() {
 		return function(Request $req, Response $res) {
 			$data = yield from $this->manager->recent($req);

@@ -3,8 +3,6 @@
 namespace Bugcache;
 
 use Aerys;
-use Aerys\Request;
-use Aerys\Response;
 use Aerys\Session;
 use Amp\Mysql;
 use Amp\Redis;
@@ -17,8 +15,13 @@ $mysql = new Mysql\Pool(BUGCACHE["mysql"]);
 $redis = new Redis\Client(BUGCACHE["redis"]);
 $mutex = new Redis\Mutex(BUGCACHE["redis"], []);
 
+$mustache = new Mustache(new \Mustache_Engine([
+    'loader' => new \Mustache_Loader_FilesystemLoader(__DIR__ . '/../res/templates'),
+]));
+
 $bugmanager = new BugManager($mysql);
-$loginHandler = new LoginHandler(new UserRepository($mysql), new AuthenticationRepository($mysql), new LoginManager(), new Mustache(new \Mustache_Engine));
+$loginHandler = new LoginHandler(new UserRepository($mysql), new AuthenticationRepository($mysql), new LoginManager(), $mustache);
+$bugdisplay = new BugDisplay($bugmanager, $mustache);
 
 $api = Aerys\router()
     // @TODO ->use($token_validation)
@@ -29,24 +32,8 @@ $api = Aerys\router()
     ->delete("/bugs/{id:[1-9][0-9]*}", jsonify([$bugmanager, "delete"]))
 ;
 
-$mustache = new \Mustache_Engine([
-    'loader' => new \Mustache_Loader_FilesystemLoader(__DIR__ . '/../public/templates'),
-]);
-
-$bugdisplay = new BugDisplay($bugmanager, $mustache);
-
 $router = Aerys\router()
-    ->get("/", function (Request $request, Response $response) {
-        /** @var Session $session */
-        $session = yield (new Session($request))->read();
-
-        if ($session->get(SessionKeys::LOGIN)) {
-            $response->end("<form action='/logout' method='POST'><button type='submit'>logout</button></form>");
-        } else {
-            $response->end("<a href='/login'>login</a>");
-        }
-    })
-    ->get("/dashboard", $bugdisplay->index())
+    ->get("/", $bugdisplay->index())
     ->get("/recent", $bugdisplay->recent())
     ->get("/{id:[1-9][0-9]*}", $bugdisplay->displayBug())
     ->get("/login", [$loginHandler, "showLogin"])
