@@ -5,8 +5,6 @@ namespace Bugcache\Authentication;
 use Aerys\Session;
 use Bugcache\SessionKeys;
 use Generator;
-use function Aerys\parseBody;
-use function Amp\resolve;
 
 class LoginManager {
     public function loginUser(Session $session, int $userId): Generator {
