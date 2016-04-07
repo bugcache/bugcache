@@ -4,10 +4,10 @@ namespace Bugcache;
 
 use Amp\Mysql as mysql;
 use Aerys\{ Request, Server };
-use Aerys as aerys;
-use Amp as amp;
+use Aerys as Aerys;
+use Amp as Amp;
 
-class BugManager implements aerys\ServerObserver, aerys\Bootable {
+class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 	private $db;
 	private $submit;
 	private $listDesc;
@@ -19,13 +19,13 @@ class BugManager implements aerys\ServerObserver, aerys\Bootable {
 		$this->db = $db;
 	}
 	
-	public function boot(Server $server, aerys\Logger $logger) {
+	public function boot(Server $server, Aerys\Logger $logger) {
 		$server->attach($this);
 	}
 
-	public function update(Server $server): amp\Promise {
+	public function update(Server $server): Amp\Promise {
 		if ($server->state() == Server::STARTING) {
-			return amp\all([
+			return Amp\all([
 				"submit" => $this->db->prepare("INSERT INTO bugs (title, data) VALUES (:title, :data)"),
 				"listDesc" => $this->db->prepare("SELECT id, title FROM bugs WHERE id < ? ORDER BY id DESC LIMIT ?"),
 				"listAsc" => $this->db->prepare("SELECT id, title FROM bugs WHERE id > ? ORDER BY id ASC LIMIT ?"),
@@ -40,11 +40,11 @@ class BugManager implements aerys\ServerObserver, aerys\Bootable {
 			});
 		}
 
-		return new amp\Success;
+		return new Amp\Success;
 	}
 	
 	public function submit(Request $req) {
-		$body = yield aerys\parseBody($req);
+		$body = yield Aerys\parseBody($req);
 
 		$title = $body->get("title");
 		$data = $body->get("data");

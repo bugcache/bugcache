@@ -2,8 +2,4 @@
 
 namespace Bugcache\Storage;
 
-use Exception;
-
-class StorageException extends Exception {
-
-}
+class StorageException extends \Exception { }

@@ -2,12 +2,10 @@
 
 namespace Bugcache;
 
-use Mustache_Engine;
-
 class Mustache {
     private $mustacheEngine;
 
-    public function __construct(Mustache_Engine $mustacheEngine) {
+    public function __construct(\Mustache_Engine $mustacheEngine) {
         $this->mustacheEngine = $mustacheEngine;
     }
 

@@ -2,8 +2,7 @@
 
 namespace Bugcache;
 
-use Aerys\{ Request, Response };
-use Aerys\Session;
+use Aerys\{ Request, Response, Session };
 
 class BugDisplay {
 	private $manager;

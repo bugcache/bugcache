@@ -3,13 +3,10 @@
 namespace Bugcache;
 
 use Aerys;
-use Aerys\Session;
 use Amp\Mysql;
 use Amp\Redis;
-use Bugcache\Authentication\LoginHandler;
-use Bugcache\Authentication\LoginManager;
-use Bugcache\Storage\Mysql\AuthenticationRepository;
-use Bugcache\Storage\Mysql\UserRepository;
+use Bugcache\Authentication\{ LoginHandler, LoginManager };
+use Bugcache\Storage\Mysql\{ AuthenticationRepository, UserRepository };
 
 $mysql = new Mysql\Pool(BUGCACHE["mysql"]);
 $redis = new Redis\Client(BUGCACHE["redis"]);

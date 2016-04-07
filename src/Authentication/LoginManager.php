@@ -4,10 +4,9 @@ namespace Bugcache\Authentication;
 
 use Aerys\Session;
 use Bugcache\SessionKeys;
-use Generator;
 
 class LoginManager {
-    public function loginUser(Session $session, int $userId): Generator {
+    public function loginUser(Session $session, int $userId): \Generator {
         yield $session->open();
 
         // Regenerate ID to prevent session fixation
@@ -19,7 +18,7 @@ class LoginManager {
         yield $session->save();
     }
 
-    public function logoutUser(Session $session): Generator {
+    public function logoutUser(Session $session): \Generator {
         yield $session->open();
 
         // Regenerate ID to prevent session fixation

@@ -2,27 +2,17 @@
 
 namespace Bugcache\Authentication;
 
-use Aerys\Bootable;
-use Aerys\Logger;
-use Aerys\ParsedBody;
-use Aerys\Request;
-use Aerys\Response;
-use Aerys\Server;
-use Aerys\Session;
-use Bugcache\Mustache;
-use Bugcache\SessionKeys;
-use Bugcache\Storage\AuthenticationRepository;
-use Bugcache\Storage\UserRepository;
+use Aerys\{ Request, Response, Session };
+use Aerys;
+use Bugcache\{ Mustache, SessionKeys};
+use Bugcache\Storage\{ AuthenticationRepository, UserRepository };
 use function Aerys\parseBody;
-use function Amp\resolve;
 
-class LoginHandler implements Bootable {
+class LoginHandler implements Aerys\Bootable {
     private $userRepository;
     private $authenticationRepository;
     private $mustacheEngine;
     private $loginManager;
-
-    /** @var Logger */
     private $logger;
 
     public function __construct(UserRepository $userRepository, AuthenticationRepository $authenticationRepository, LoginManager $loginManager, Mustache $mustacheEngine) {
@@ -32,7 +22,7 @@ class LoginHandler implements Bootable {
         $this->loginManager = $loginManager;
     }
 
-    public function boot(Server $server, Logger $logger) {
+    public function boot(Aerys\Server $server, Aerys\Logger $logger) {
         $this->logger = $logger;
     }
 
@@ -57,7 +47,7 @@ class LoginHandler implements Bootable {
         /** @var Session $session */
         $session = yield (new Session($request))->read();
 
-        /** @var ParsedBody $body */
+        /** @var Aerys\ParsedBody $body */
         $body = yield parseBody($request);
 
         $username = $body->get("username") ?? "";

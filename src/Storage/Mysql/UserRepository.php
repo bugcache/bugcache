@@ -2,11 +2,9 @@
 
 namespace Bugcache\Storage\Mysql;
 
-use Amp\Mysql\Pool;
-use Amp\Mysql\ResultSet;
+use Amp\Mysql\{ Pool, ResultSet };
 use Amp\Promise;
 use Bugcache\Storage;
-use Generator;
 use function Amp\resolve;
 
 class UserRepository implements Storage\UserRepository {
@@ -22,7 +20,7 @@ class UserRepository implements Storage\UserRepository {
         return resolve($this->fetchUser($sql, [$username]));
     }
 
-    private function fetchUser(string $sql, array $params = []): Generator {
+    private function fetchUser(string $sql, array $params = []): \Generator {
         /** @var ResultSet $result */
         $result = yield $this->mysql->prepare($sql, $params);
 
