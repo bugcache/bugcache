@@ -30,7 +30,7 @@ class BugDisplay {
 	public function recent() {
 		return function(Request $req, Response $res) {
 			$data = yield from $this->manager->recent($req);
-			if (!$data) {
+			if ($data === null) {
 				$res->setStatus(403);
 				$res->end("Bad request");
 				return;
@@ -42,7 +42,7 @@ class BugDisplay {
 	public function displayBug() {
 		return function(Request $req, Response $res, $routerInfo) {
 			$data = yield from $this->manager->fetchBug($req, $routerInfo);
-			if (!$data) {
+			if ($data === null) {
 				$res->setStatus(403);
 				$res->end("Bad request");
 				return;

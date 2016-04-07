@@ -4,7 +4,7 @@ namespace Bugcache\Authentication;
 
 use Aerys\{ Request, Response, Session };
 use Aerys;
-use Bugcache\{ Mustache, SessionKeys};
+use Bugcache\{ Mustache, SessionKeys };
 use Bugcache\Storage\{ AuthenticationRepository, UserRepository };
 use function Aerys\parseBody;
 
