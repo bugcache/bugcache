@@ -6,6 +6,7 @@ use Aerys\{ Request, Response, Session };
 use Aerys;
 use Bugcache\{ Mustache, SessionKeys };
 use Bugcache\Storage\{ AuthenticationRepository, UserRepository };
+use Bugcache\RequestKeys;
 use function Aerys\parseBody;
 
 class LoginHandler implements Aerys\Bootable {
@@ -24,6 +25,14 @@ class LoginHandler implements Aerys\Bootable {
 
     public function boot(Aerys\Server $server, Aerys\Logger $logger) {
         $this->logger = $logger;
+    }
+
+    public function __invoke(Request $request, Response $response) {
+        /** @var Session $session */
+        $session = yield (new Session($request))->read();
+
+        $user = yield $this->userRepository->findById($session->get(SessionKeys::LOGIN) ?? 0);
+        $request->setLocalVar(RequestKeys::USER, $user);
     }
 
     public function showLogin(Request $request, Response $response) {

@@ -29,19 +29,23 @@ $api = Aerys\router()
     ->delete("/bugs/{id:[1-9][0-9]*}", jsonify([$bugmanager, "delete"]))
 ;
 
-$router = Aerys\router()
+$ui = Aerys\router()
+    ->use($loginHandler)
     ->get("/", $bugdisplay->index())
     ->get("/recent", $bugdisplay->recent())
     ->get("/{id:[1-9][0-9]*}", $bugdisplay->displayBug())
     ->get("/login", [$loginHandler, "showLogin"])
     ->post("/login", [$loginHandler, "processPasswordLogin"])
     ->post("/logout", [$loginHandler, "processLogout"])
-    ->use(Aerys\root(__DIR__ . "/../public"))
-    ->use($api->prefix("/api"))
-    ->use($loginHandler)
     ->use(Aerys\session([
         "driver" => new Aerys\Session\Redis($redis, $mutex)
     ]))
+;
+
+$router = Aerys\router()
+    ->use($ui)
+    ->use($api->prefix("/api"))
+    ->use(Aerys\root(__DIR__ . "/../public"))
 ;
 
 return $router;

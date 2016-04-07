@@ -20,6 +20,12 @@ class UserRepository implements Storage\UserRepository {
         return resolve($this->fetchUser($sql, [$username]));
     }
 
+    public function findById(int $userId): Promise {
+        $sql = "SELECT id, name FROM users WHERE id = ?";
+
+        return resolve($this->fetchUser($sql, [$userId]));
+    }
+
     private function fetchUser(string $sql, array $params = []): \Generator {
         /** @var ResultSet $result */
         $result = yield $this->mysql->prepare($sql, $params);
