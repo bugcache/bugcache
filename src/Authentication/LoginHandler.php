@@ -30,14 +30,15 @@ class LoginHandler implements Aerys\Bootable {
     public function __invoke(Request $request, Response $response) {
         /** @var Session $session */
         $session = yield (new Session($request))->read();
-
         $user = yield $this->userRepository->findById($session->get(SessionKeys::LOGIN) ?? 0);
+
         $request->setLocalVar(RequestKeys::USER, $user);
+        $request->setLocalVar(RequestKeys::SESSION, $session);
     }
 
     public function showLogin(Request $request, Response $response) {
         /** @var Session $session */
-        $session = yield (new Session($request))->read();
+        $session = $request->getLocalVar(RequestKeys::SESSION);
 
         if ($session->get(SessionKeys::LOGIN)) {
             $response->setStatus(302);
@@ -54,7 +55,7 @@ class LoginHandler implements Aerys\Bootable {
 
     public function processPasswordLogin(Request $request, Response $response) {
         /** @var Session $session */
-        $session = yield (new Session($request))->read();
+        $session = $request->getLocalVar(RequestKeys::SESSION);
 
         /** @var Aerys\ParsedBody $body */
         $body = yield parseBody($request);
@@ -95,7 +96,7 @@ class LoginHandler implements Aerys\Bootable {
 
     public function processLogout(Request $request, Response $response) {
         /** @var Session $session */
-        $session = yield (new Session($request))->read();
+        $session = $request->getLocalVar(RequestKeys::SESSION);
 
         yield from $this->loginManager->logoutUser($session);
 
