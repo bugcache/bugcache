@@ -35,8 +35,8 @@ class UserRepository implements Storage\UserRepository {
             return $record;
         } else {
             return (object) [
-                "id" => 0,
-                "name" => "anonymous",
+                "id" => \Bugcache\ANONYMOUS_USER_ID,
+                "name" => \Bugcache\ANONYMOUS_USER_NAME,
             ];
         }
     }
