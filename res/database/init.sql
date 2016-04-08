@@ -13,11 +13,12 @@ DROP TABLE IF EXISTS `authenticators`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `authenticators` (
-  `user_id` int(11) NOT NULL,
+  `user` int(11) NOT NULL,
   `type` varchar(45) NOT NULL,
   `token` varchar(255) NOT NULL,
-  `identity` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`user_id`,`type`)
+  `identity` varchar(45) NOT NULL,
+  `valid_until` int(11) NOT NULL,
+  PRIMARY KEY (`user`,`type`,`identity`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `bugs`;
@@ -28,6 +29,15 @@ CREATE TABLE `bugs` (
   `title` text NOT NULL,
   `data` longtext NOT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `config`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `config` (
+  `key` varchar(45) NOT NULL,
+  `value` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `users`;

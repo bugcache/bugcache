@@ -15,7 +15,7 @@ class BugDisplay {
 
 	public function index() {
 		return function(Request $req, Response $res) {
-			$session = yield (new Session($req))->read();
+			$session = $req->getLocalVar(RequestKeys::SESSION);
 
 			$res->end($this->mustache->render("index.mustache", (object) [
 				"meta" => (object) [
