@@ -4,7 +4,7 @@ namespace Bugcache\Storage\Mysql;
 
 use Amp\Mysql\{ Pool, ResultSet };
 use Amp\Promise;
-use Bugcache\Storage;
+use Bugcache\{ Storage, const ANONYMOUS_USER };
 use function Amp\resolve;
 
 class UserRepository implements Storage\UserRepository {
@@ -35,8 +35,8 @@ class UserRepository implements Storage\UserRepository {
             return $record;
         } else {
             return (object) [
-                "id" => \Bugcache\ANONYMOUS_USER_ID,
-                "name" => \Bugcache\ANONYMOUS_USER_NAME,
+                "id" => 0,
+                "name" => ANONYMOUS_USER,
             ];
         }
     }
