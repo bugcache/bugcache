@@ -42,17 +42,7 @@ $ui = Aerys\router()
     ->use(Aerys\session([
         "driver" => new Aerys\Session\Redis($redis, $mutex)
     ]))
-;
-
-$router = Aerys\router()
-    ->use($ui)
-    ->use($api->prefix("/api"))
-;
-
-return [
-    $router,
-    Aerys\root(dirname(__DIR__) . "/public"),
-    new class implements Aerys\Middleware {
+    ->use(new class implements Aerys\Middleware {
         public function do (Aerys\InternalRequest $request) {
             $headers = yield;
 
@@ -63,5 +53,13 @@ return [
 
             return $headers;
         }
-    },
-];
+    })
+;
+
+$router = Aerys\router()
+    ->use($ui)
+    ->use($api->prefix("/api"))
+    ->get("/{path:.*}", Aerys\root(dirname(__DIR__) . "/public"))
+;
+
+return $router;

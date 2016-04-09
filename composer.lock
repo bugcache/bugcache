@@ -9,16 +9,16 @@
     "packages": [
         {
             "name": "amphp/aerys",
-            "version": "v0.4.1",
+            "version": "v0.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/aerys.git",
-                "reference": "137352ab2d8d89ec7a8f9d70a084fcc35949e0b5"
+                "reference": "6ba57a55113beb5bf4b41d95781f14cc00eecde7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/aerys/zipball/137352ab2d8d89ec7a8f9d70a084fcc35949e0b5",
-                "reference": "137352ab2d8d89ec7a8f9d70a084fcc35949e0b5",
+                "url": "https://api.github.com/repos/amphp/aerys/zipball/6ba57a55113beb5bf4b41d95781f14cc00eecde7",
+                "reference": "6ba57a55113beb5bf4b41d95781f14cc00eecde7",
                 "shasum": ""
             },
             "require": {
@@ -34,7 +34,7 @@
                 "amphp/artax": "^2",
                 "fabpot/php-cs-fixer": "^1.9",
                 "http2jp/hpack-test-case": "1.0",
-                "phpunit/phpunit": "~5.2.12"
+                "phpunit/phpunit": "^5.2"
             },
             "bin": [
                 "bin/aerys"
@@ -85,7 +85,7 @@
                 "server",
                 "websocket"
             ],
-            "time": "2016-04-06 17:24:32"
+            "time": "2016-04-09 12:25:32"
         },
         {
             "name": "amphp/aerys-session",
@@ -1015,16 +1015,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "3.3.0",
+            "version": "3.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "fe33716763b604ade4cb442c0794f5bd5ad73004"
+                "reference": "2431befdd451fac43fbcde94d1a92fb3b8b68f86"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/fe33716763b604ade4cb442c0794f5bd5ad73004",
-                "reference": "fe33716763b604ade4cb442c0794f5bd5ad73004",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/2431befdd451fac43fbcde94d1a92fb3b8b68f86",
+                "reference": "2431befdd451fac43fbcde94d1a92fb3b8b68f86",
                 "shasum": ""
             },
             "require": {
@@ -1042,7 +1042,7 @@
             },
             "suggest": {
                 "ext-dom": "*",
-                "ext-xdebug": ">=2.2.1",
+                "ext-xdebug": ">=2.4.0",
                 "ext-xmlwriter": "*"
             },
             "type": "library",
@@ -1074,7 +1074,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2016-03-03 08:49:08"
+            "time": "2016-04-08 08:14:53"
         },
         {
             "name": "phpunit/php-file-iterator",

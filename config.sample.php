@@ -8,8 +8,6 @@ const BUGCACHE = [
 $host = (new Aerys\Host)
     ->name("localhost")
     ->expose("127.0.0.1", 80)
-    ->expose("::1", 80);
-
-foreach (require 'src/router.php' as $callable) {
-    $host->use($callable);
-}
+    ->expose("::1", 80)
+    ->use($callable)
+;
