@@ -8,8 +8,8 @@
 <body>
 <div class="layout-empty-center">
     <div class="login">
-        <form class="login-form" action="/login" method="POST">
-            <h1>Log In</h1>
+        <form class="login-form" action="/register" method="POST">
+            <h1>Sign Up</h1>
 
             {{#error}}
                 <div class="login-error">
@@ -35,18 +35,23 @@
                 <input id="login-password" type="password" name="password" {{#focusPassword}}autofocus{{/focusPassword}}>
             </div>
 
+            <div class="login-input">
+                <label class="login-label" for="login-password-repeat">Repeat Password</label>
+                <input id="login-password-repeat" type="password" name="password-repeat">
+            </div>
+
             <div class="login-submit">
                 <button type="submit" class="login-button">
-                    Login
+                    Sign Up
                 </button>
             </div>
         </form>
 
         <div class="login-footer">
-            Don't have an account yet?
+            Already have an account?
             <br>
-            <a href="/register" class="login-footer-action">
-                Sign Up
+            <a href="/login" class="login-footer-action">
+                Log In
             </a>
         </div>
     </div>
