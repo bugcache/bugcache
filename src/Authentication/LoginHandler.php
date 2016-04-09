@@ -69,31 +69,47 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
         $request->setLocalVar(RequestKeys::SESSION, $session);
     }
 
+    private function parseRememberMe(string $value) {
+        $parts = explode(":", $value);
+
+        if (count($parts) !== 4) {
+            return null;
+        }
+
+        list($userId, $identity, $token, $mac) = $parts;
+
+        if (!hash_equals(Base64Url::decode($mac), hash_hmac("sha256", "{$userId}:{$identity}:{$token}", $this->rememberMeKey, true))) {
+            return null;
+        }
+
+        $hashedIdentity = Base64Url::encode(hash("sha256", Base64Url::decode($identity), true));
+
+        return [
+            "user" => $userId,
+            "identity" => $hashedIdentity,
+            "token" => $token,
+        ];
+    }
+
     private function loginViaRememberToken(Request $request, Session $session) {
         if ($request->getMethod() !== "GET") {
             return;
         }
 
         $rememberMe = $request->getCookie(CookieKeys::REMEMBER_ME) ?? "";
-        $rememberMeParts = explode(":", $rememberMe);
+        $rememberInfo = $this->parseRememberMe($rememberMe);
 
-        if (count($rememberMeParts) !== 4) {
+        if (!$rememberInfo) {
             return;
         }
 
-        list($userId, $identity, $token, $mac) = $rememberMeParts;
-
-        if (!hash_equals(Base64Url::decode($mac), hash_hmac("sha256", "{$userId}:{$identity}:{$token}", $this->rememberMeKey, true))) {
-            return;
-        }
-
-        $auth = yield $this->authenticationRepository->findByIdentity($identity, AuthenticationRepository::TYPE_REMEMBER_ME);
+        $auth = yield $this->authenticationRepository->findByIdentity($rememberInfo["user"], $rememberInfo["identity"], AuthenticationRepository::TYPE_REMEMBER_ME);
 
         if ($auth["valid_until"] !== 0 && $auth["valid_until"] < time()) {
             return;
         }
 
-        if (hash_equals($auth["token"] ?? "", $token)) {
+        if (hash_equals($auth["token"] ?? "", $rememberInfo["token"])) {
             $this->logger->info("New login for UID = {$auth["user"]} via remember me token");
             yield from $this->loginManager->loginUser($session, $auth["user"]);
         }
@@ -147,17 +163,23 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
             yield from $this->loginManager->loginUser($session, $user->id);
 
             if ($remember) {
-                $identity = Base64Url::encode(random_bytes(16));
-                $token = Base64Url::encode(random_bytes(32));
+                $rawIdentity = random_bytes(16);
+                $rawToken = random_bytes(32);
                 $validTime = 60 * 60 * 24 * 30;
 
-                yield $this->authenticationRepository->store($user->id, AuthenticationRepository::TYPE_REMEMBER_ME, $token, $identity, time() + $validTime);
+                $hashedIdentity = hash("sha256", $rawIdentity, true);
+                $base64HashedIdentity = Base64Url::encode($hashedIdentity);
 
-                $mac = Base64Url::encode(hash_hmac("sha256", "{$user->id}:{$identity}:{$token}", $this->rememberMeKey, true));
-                $cookie = "{$user->id}:{$identity}:{$token}:{$mac}";
+                $base64Identity = Base64Url::encode($rawIdentity);
+                $base64Token = Base64Url::encode($rawToken);
+
+                yield $this->authenticationRepository->store($user->id, AuthenticationRepository::TYPE_REMEMBER_ME, $base64Token, $base64HashedIdentity, time() + $validTime);
+
+                $mac = Base64Url::encode(hash_hmac("sha256", "{$user->id}:{$base64Identity}:{$base64Token}", $this->rememberMeKey, true));
+                $cookie = "{$user->id}:{$base64Identity}:{$base64Token}:{$mac}";
                 $cookieFlags = [
-                    "Max-Age=" . $validTime,
-                    "Path=/",
+                    "Max-Age" => $validTime,
+                    "Path" => "/",
                     "HttpOnly",
                 ];
 
@@ -183,11 +205,21 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
     public function processLogout(Request $request, Response $response) {
         /** @var Session $session */
         $session = $request->getLocalVar(RequestKeys::SESSION);
+        $rememberMe = $request->getCookie(CookieKeys::REMEMBER_ME);
+
+        if ($rememberMe) {
+            // If there's a valid remember me cookie, we have to remove it, otherwise a user would get logged in again immediately.
+            // We also remove it from our database to ensure it can no longer be used!
+            $rememberInfo = $this->parseRememberMe($rememberMe);
+
+            if ($rememberInfo) {
+                yield $this->authenticationRepository->delete($session->get(SessionKeys::LOGIN), AuthenticationRepository::TYPE_REMEMBER_ME, $rememberInfo["identity"]);
+            }
+
+            $response->setCookie(CookieKeys::REMEMBER_ME, "", ["Max-Age=0", "Path=/", "HttpOnly"]);
+        }
 
         yield from $this->loginManager->logoutUser($session);
-
-        // Remove remember me cookie on explicit logout
-        $response->setCookie(CookieKeys::REMEMBER_ME, "", ["Max-Age=0", "Path=/", "HttpOnly"]);
 
         $response->setStatus(302);
         $response->setHeader("location", "/");
