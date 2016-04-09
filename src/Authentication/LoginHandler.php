@@ -8,7 +8,9 @@ use Amp;
 use Amp\{ Promise, function resolve };
 use Bugcache\{ ConfigKeys, CookieKeys, Encoding\Base64Url, Mustache, SessionKeys };
 use Bugcache\RequestKeys;
-use Bugcache\Storage\{ AuthenticationRepository, ConfigRepository, UserRepository };
+use Bugcache\Storage\{
+    AuthenticationRepository, ConfigRepository, ConflictException, UserRepository
+};
 
 class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
     private $configRepository;
@@ -127,14 +129,20 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
             return;
         }
 
-        $content = $this->mustacheEngine->render("login.mustache");
-
-        $response->end($content);
+        $response->end($this->mustacheEngine->render("login.mustache"));
     }
 
     public function processPasswordLogin(Request $request, Response $response) {
         /** @var Session $session */
         $session = $request->getLocalVar(RequestKeys::SESSION);
+
+        if ($session->get(SessionKeys::LOGIN)) {
+            $response->setStatus(302);
+            $response->setHeader("location", "/");
+            $response->end("");
+
+            return;
+        }
 
         /** @var Aerys\ParsedBody $body */
         $body = yield Aerys\parseBody($request);
@@ -147,7 +155,11 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
         $auth = yield $this->authenticationRepository->findByUser($user->id, AuthenticationRepository::TYPE_PASSWORD);
 
         if ($user->id === 0) {
-            $response->end("User does not exist! <a href='/login'>Retry</a>");
+            $response->end($this->mustacheEngine->render("login.mustache", [
+                "error" => "User does not exist.",
+                "username" => $username,
+                "selectUsername" => true,
+            ]));
 
             return;
         }
@@ -199,7 +211,11 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
 
         $this->logger->info("Failed password authentication for user '{$user->name}' ({$user->id}).");
 
-        $response->end("Wrong password! <a href='/login'>Retry</a>");
+        $response->end($this->mustacheEngine->render("login.mustache", [
+            "error" => "Wrong password.",
+            "username" => $username,
+            "focusPassword" => true,
+        ]));
     }
 
     public function processLogout(Request $request, Response $response) {
@@ -224,5 +240,99 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
         $response->setStatus(302);
         $response->setHeader("location", "/");
         $response->end("");
+    }
+
+    public function showRegister(Request $request, Response $response) {
+        /** @var Session $session */
+        $session = $request->getLocalVar(RequestKeys::SESSION);
+
+        if ($session->get(SessionKeys::LOGIN)) {
+            $response->setStatus(302);
+            $response->setHeader("location", "/");
+            $response->end("");
+
+            return;
+        }
+
+        $response->end($this->mustacheEngine->render("register.mustache"));
+    }
+
+    public function processRegister(Request $request, Response $response) {
+        /** @var Session $session */
+        $session = $request->getLocalVar(RequestKeys::SESSION);
+
+        if ($session->get(SessionKeys::LOGIN)) {
+            $response->setStatus(302);
+            $response->setHeader("location", "/");
+            $response->end("");
+
+            return;
+        }
+
+        /** @var Aerys\ParsedBody $body */
+        $body = yield Aerys\parseBody($request);
+
+        $username = $body->get("username") ?? "";
+        $password = $body->get("password") ?? "";
+        $repeat = $body->get("password-repeat") ?? "";
+
+        if ($password !== $repeat) {
+            $response->end($this->mustacheEngine->render("register.mustache", [
+                "error" => "Passwords do not match.",
+                "username" => $username,
+                "focusPassword" => true,
+            ]));
+
+            return;
+        }
+
+        if (!$this->isValidUsername($username)) {
+            $response->end($this->mustacheEngine->render("register.mustache", [
+                "error" => "Username must start with a-z and must consist of alphanumeric characters and dashes only.",
+                "username" => $username,
+                "selectUsername" => true,
+            ]));
+        }
+
+        try {
+            $userId = yield $this->userRepository->create($username);
+            yield $this->authenticationRepository->store($userId, AuthenticationRepository::TYPE_PASSWORD, password_hash($password, PASSWORD_BCRYPT));
+
+            $this->logger->info("New registration: Username = '{$username}', ID = {$userId}");
+        } catch (ConflictException $e) {
+            $response->end($this->mustacheEngine->render("register.mustache", [
+                "error" => "Username already taken.",
+                "username" => $username,
+                "selectUsername" => true,
+            ]));
+
+            return;
+        }
+
+        yield from $this->loginManager->loginUser($session, $userId);
+
+        $response->setStatus(302);
+        $response->setHeader("location", "/welcome");
+        $response->end("");
+    }
+
+    private function isValidUsername(string $username): bool {
+        // Must not be longer than 30 characters
+        // strlen is fine here, since we only allow ASCII characters
+        if (strlen($username) > 30) {
+            return false;
+        }
+
+        // Usernames must consist of alphanumeric characters, maybe separated with single dashes.
+        if (!preg_match("~^[a-z](([a-z0-9]+)-?)*$~", $username)) {
+            return false;
+        }
+
+        // Must not end with a dash.
+        if ($username[strlen($username) - 1] === "-") {
+            return false;
+        }
+
+        return true;
     }
 }

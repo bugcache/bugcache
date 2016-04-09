@@ -82,6 +82,7 @@ body {
 }
 
 .login-footer-action {
+    display: inline-block;
     font-size: 14px;
     color: #2c8cec;
     background: white;
@@ -92,9 +93,17 @@ body {
     border-radius: 2px;
     border: 0;
     cursor: pointer;
+    text-decoration: none;
     transition: box-shadow 200ms;
 }
 
 .login-footer-action:hover {
     box-shadow: 0 0 15px rgba(0,0,0,.2);
+    text-decoration: none;
+}
+
+.login-error {
+    color: #d00;
+    font-weight: bold;
+    font-size: 12px;
 }

@@ -37,6 +37,8 @@ $ui = Aerys\router()
     ->get("/login", [$loginHandler, "showLogin"])
     ->post("/login", [$loginHandler, "processPasswordLogin"])
     ->post("/logout", [$loginHandler, "processLogout"])
+    ->get("/register", [$loginHandler, "showRegister"])
+    ->post("/register", [$loginHandler, "processRegister"])
     ->use(Aerys\session([
         "driver" => new Aerys\Session\Redis($redis, $mutex)
     ]))
@@ -50,4 +52,16 @@ $router = Aerys\router()
 return [
     $router,
     Aerys\root(dirname(__DIR__) . "/public"),
+    new class implements Aerys\Middleware {
+        public function do (Aerys\InternalRequest $request) {
+            $headers = yield;
+
+            $headers["x-frame-options"] = ["SAMEORIGIN"];
+            $headers["x-xss-protection"] = ["1; mode=block"];
+            $headers["x-ua-compatible"] = ["IE=Edge,chrome=1"];
+            $headers["x-content-type-options"] = ["nosniff"];
+
+            return $headers;
+        }
+    },
 ];
