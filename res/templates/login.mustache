@@ -3,22 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+    <link rel="stylesheet" href="/screen.css" media="screen">
 </head>
 <body>
-<h1>Login</h1>
-<form action="/login" method="POST">
-    <input type="text" name="username"/>
-    <br>
-    <input type="password" name="password"/>
-    <br>
-    <label>
-        <input type="checkbox" name="remember" value="yes"/>
-        Remember Me?
-    </label>
-    <br>
-    <button type="submit">
-        Login
-    </button>
-</form>
+<div class="layout-empty-center">
+    <div class="login">
+        <form class="login-form" action="/login" method="POST">
+            <h1>Log In</h1>
+
+            <div class="login-input">
+                <label class="login-label" for="login-username">Username</label>
+                <input id="login-username" type="text" name="username" autofocus>
+            </div>
+
+            <div class="login-input">
+                <label class="login-label" for="login-password">Password</label>
+                <input id="login-password" type="password" name="password">
+            </div>
+
+            <div class="login-submit">
+                <button type="submit" class="login-button">
+                    Login
+                </button>
+            </div>
+        </form>
+
+        <div class="login-footer">
+            Don't have an account yet?
+            <br>
+            <form action="/register" method="GET">
+                <button type="submit" class="login-register">
+                    Sign Up
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
 </body>
 </html>
