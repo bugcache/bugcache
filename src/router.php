@@ -45,7 +45,9 @@ $ui = Aerys\router()
 $router = Aerys\router()
     ->use($ui)
     ->use($api->prefix("/api"))
-    ->use(Aerys\root(__DIR__ . "/../public"))
 ;
 
-return $router;
+return [
+    $router,
+    Aerys\root(dirname(__DIR__) . "/public"),
+];

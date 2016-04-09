@@ -5,8 +5,11 @@ const BUGCACHE = [
     "redis" => "tcp://localhost:6379",
 ];
 
-(new Aerys\Host)
+$host = (new Aerys\Host)
     ->name("localhost")
     ->expose("127.0.0.1", 80)
-    ->expose("::1", 80)
-    ->use(require 'src/router.php');
+    ->expose("::1", 80);
+
+foreach (require 'src/router.php' as $callable) {
+    $host->use($callable);
+}
