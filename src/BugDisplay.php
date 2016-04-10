@@ -17,13 +17,7 @@ class BugDisplay {
 		return function(Request $req, Response $res) {
 			$session = $req->getLocalVar(RequestKeys::SESSION);
 
-			$res->end($this->mustache->render("index.mustache", (object) [
-				"meta" => (object) [
-					"user" => (object) [
-						"id" => $session->get(SessionKeys::LOGIN) ?? 0,
-					],
-				],
-			]));
+			$res->end($this->mustache->render("index.mustache", new TemplateContext($req)));
 		};
 	}
 
@@ -35,7 +29,7 @@ class BugDisplay {
 				$res->end("Bad request");
 				return;
 			}
-			$res->end($this->mustache->render("list.mustache", ["data" => $data]));
+			$res->end($this->mustache->render("list.mustache", new TemplateContext($req, ["data" => $data])));
 		};
 	}
 
@@ -49,7 +43,7 @@ class BugDisplay {
 			}
 
 			$data->id = (int) $routerInfo["id"];
-			$res->end($this->mustache->render("bug.mustache", $data));
+			$res->end($this->mustache->render("bug.mustache", new TemplateContext($req, $data)));
 		};
 	}
 }

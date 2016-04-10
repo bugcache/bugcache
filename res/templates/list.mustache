@@ -4,11 +4,11 @@
 		<title>Bugcache</title>
 	</head>
 	<body>
-		{{#data}}
+		{{#data.data}}
 			<a href="/{{id}}">#{{id}} &mdash; {{title}}</a><br>
-		{{/data}}
-		{{^data}}
+		{{/data.data}}
+		{{^data.data}}
 			No bugs there...
-		{{/data}}
+		{{/data.data}}
 	</body>
 </html>

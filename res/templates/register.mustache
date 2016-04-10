@@ -11,28 +11,28 @@
         <form class="login-form" action="/register" method="POST">
             <h1>Sign Up</h1>
 
-            {{#error}}
+            {{#data.error}}
                 <div class="login-error">
-                    {{error}}
+                    {{data.error}}
                 </div>
-            {{/error}}
+            {{/data.error}}
 
             <div class="login-input">
                 <label class="login-input-label" for="login-username">Username</label>
-                <input id="login-username" type="text" name="username" value="{{username}}" {{^focusPassword}}autofocus{{/focusPassword}}>
+                <input id="login-username" type="text" name="username" value="{{data.username}}" {{^data.focusPassword}}autofocus{{/data.focusPassword}}>
             </div>
 
-            {{#selectUsername}}
+            {{#data.selectUsername}}
                 <script>
                     var input = document.getElementById("login-username");
                     input.select();
                     input.focus();
                 </script>
-            {{/selectUsername}}
+            {{/data.selectUsername}}
 
             <div class="login-input">
                 <label class="login-input-label" for="login-password">Password</label>
-                <input id="login-password" type="password" name="password" {{#focusPassword}}autofocus{{/focusPassword}}>
+                <input id="login-password" type="password" name="password" {{#data.focusPassword}}autofocus{{/data.focusPassword}}>
             </div>
 
             <div class="login-input">

@@ -6,7 +6,9 @@ use Aerys;
 use Aerys\{ Request, Response, Server, Session };
 use Amp;
 use Amp\{ Promise, function resolve };
-use Bugcache\{ Authentication\Captcha\RecaptchaVerifier, ConfigKeys, CookieKeys, Encoding\Base64Url, Mustache, SessionKeys };
+use Bugcache\{
+    Authentication\Captcha\RecaptchaVerifier, ConfigKeys, CookieKeys, Encoding\Base64Url, Mustache, SessionKeys, TemplateContext
+};
 use Bugcache\RequestKeys;
 use Bugcache\Storage\{ AuthenticationRepository, ConfigRepository, ConflictException, UserRepository };
 
@@ -129,7 +131,7 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
             return;
         }
 
-        $response->end($this->mustacheEngine->render("login.mustache"));
+        $response->end($this->mustacheEngine->render("login.mustache", new TemplateContext($request)));
     }
 
     public function processPasswordLogin(Request $request, Response $response) {
@@ -155,11 +157,11 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
         $auth = yield $this->authenticationRepository->findByUser($user->id, AuthenticationRepository::TYPE_PASSWORD);
 
         if ($user->id === 0) {
-            $response->end($this->mustacheEngine->render("login.mustache", [
+            $response->end($this->mustacheEngine->render("login.mustache", new TemplateContext($request, [
                 "error" => "User does not exist.",
                 "username" => $username,
                 "selectUsername" => true,
-            ]));
+            ])));
 
             return;
         }
@@ -211,11 +213,11 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
 
         $this->logger->info("Failed password authentication for user '{$user->name}' ({$user->id}).");
 
-        $response->end($this->mustacheEngine->render("login.mustache", [
+        $response->end($this->mustacheEngine->render("login.mustache", new TemplateContext($request, [
             "error" => "Wrong password.",
             "username" => $username,
             "focusPassword" => true,
-        ]));
+        ])));
     }
 
     public function processLogout(Request $request, Response $response) {
@@ -254,9 +256,7 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
             return;
         }
 
-        $response->end($this->mustacheEngine->render("register.mustache", [
-            "recaptchaKey" => BUGCACHE["recaptchaKey"],
-        ]));
+        $response->end($this->mustacheEngine->render("register.mustache", new TemplateContext($request)));
     }
 
     public function processRegister(Request $request, Response $response) {
@@ -280,12 +280,11 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
         $captchaResponse = $body->get("g-recaptcha-response") ?? "";
 
         if (empty($captchaResponse)) {
-            $response->end($this->mustacheEngine->render("register.mustache", [
+            $response->end($this->mustacheEngine->render("register.mustache", new TemplateContext($request, [
                 "error" => "No captcha solved.",
                 "username" => $username,
                 "focusPassword" => true,
-                "recaptchaKey" => BUGCACHE["recaptchaKey"],
-            ]));
+            ])));
 
             return;
         }
@@ -293,33 +292,31 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
         $captchaValid = yield $this->recaptchaVerifier->verify($captchaResponse);
 
         if (!$captchaValid) {
-            $response->end($this->mustacheEngine->render("register.mustache", [
+            $response->end($this->mustacheEngine->render("register.mustache", new TemplateContext($request, [
                 "error" => "Incorrect captcha.",
                 "username" => $username,
                 "focusPassword" => true,
-                "recaptchaKey" => BUGCACHE["recaptchaKey"],
-            ]));
+            ])));
 
             return;
         }
 
         if ($password !== $repeat) {
-            $response->end($this->mustacheEngine->render("register.mustache", [
+            $response->end($this->mustacheEngine->render("register.mustache", new TemplateContext($request, [
                 "error" => "Passwords do not match.",
                 "username" => $username,
                 "focusPassword" => true,
-                "recaptchaKey" => BUGCACHE["recaptchaKey"],
-            ]));
+            ])));
 
             return;
         }
 
         if (!$this->isValidUsername($username)) {
-            $response->end($this->mustacheEngine->render("register.mustache", [
+            $response->end($this->mustacheEngine->render("register.mustache", new TemplateContext($request, [
                 "error" => "Username must start with a-z and must consist of alphanumeric characters and dashes only.",
                 "username" => $username,
                 "selectUsername" => true,
-            ]));
+            ])));
         }
 
         try {
@@ -328,12 +325,11 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
 
             $this->logger->info("New registration: Username = '{$username}', ID = {$userId}");
         } catch (ConflictException $e) {
-            $response->end($this->mustacheEngine->render("register.mustache", [
+            $response->end($this->mustacheEngine->render("register.mustache", new TemplateContext($request, [
                 "error" => "Username already taken.",
                 "username" => $username,
                 "selectUsername" => true,
-                "recaptchaKey" => BUGCACHE["recaptchaKey"],
-            ]));
+            ])));
 
             return;
         }

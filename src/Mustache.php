@@ -9,7 +9,7 @@ class Mustache {
         $this->mustacheEngine = $mustacheEngine;
     }
 
-    public function render(string $filename, $context = []) {
-        return $this->mustacheEngine->render($filename, $context);
+    public function render(string $filename, TemplateContext $context) {
+        return $this->mustacheEngine->render($filename, $context->getContext());
     }
 }
