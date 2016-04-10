@@ -9,4 +9,4 @@ $host = (new Aerys\Host)
     ->name("localhost")
     ->expose("127.0.0.1", 80)
     ->expose("::1", 80)
-    ->use(require __DIR__ . "src/router.php");
+    ->use(require __DIR__ . "/src/router.php");
