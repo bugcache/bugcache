@@ -18,7 +18,7 @@ body {
 
 .login {
     width: 90vw;
-    max-width: 300px;
+    max-width: 362px;
     text-align: center;
 }
 
@@ -120,4 +120,8 @@ body {
     color: #d00;
     font-weight: bold;
     font-size: 12px;
+}
+
+.login #captcha {
+    margin-bottom: 20px;
 }

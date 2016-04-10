@@ -36,9 +36,11 @@
             </div>
 
             <div class="login-input">
-                <label class="login-label" for="login-password-repeat">Repeat Password</label>
+                <label class="login-input-label" for="login-password-repeat">Repeat Password</label>
                 <input id="login-password-repeat" type="password" name="password-repeat">
             </div>
+
+            {{> recaptcha}}
 
             <div class="login-submit">
                 <button type="submit" class="login-button">

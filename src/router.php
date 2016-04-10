@@ -3,9 +3,11 @@
 namespace Bugcache;
 
 use Aerys;
+use Amp\Artax\Client;
+use Amp\Artax\Cookie\NullCookieJar;
 use Amp\Mysql;
 use Amp\Redis;
-use Bugcache\Authentication\{ LoginHandler, LoginManager };
+use Bugcache\Authentication\{ Captcha\RecaptchaVerifier, LoginHandler, LoginManager };
 use Bugcache\Storage\Mysql\{ AuthenticationRepository, ConfigRepository, UserRepository };
 
 $mysql = new Mysql\Pool(BUGCACHE["mysql"]);
@@ -17,7 +19,7 @@ $mustache = new Mustache(new \Mustache_Engine([
 ]));
 
 $bugmanager = new BugManager($mysql);
-$loginHandler = new LoginHandler(new ConfigRepository($mysql), new UserRepository($mysql), new AuthenticationRepository($mysql), new LoginManager(), $mustache);
+$loginHandler = new LoginHandler(new RecaptchaVerifier(new Client(new NullCookieJar), BUGCACHE["recaptchaSecret"]), new ConfigRepository($mysql), new UserRepository($mysql), new AuthenticationRepository($mysql), new LoginManager(), $mustache);
 $bugdisplay = new BugDisplay($bugmanager, $mustache);
 
 $api = Aerys\router()

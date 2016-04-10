@@ -1,0 +1,15 @@
+<div id="captcha"></div>
+
+<script type="text/javascript">
+    var recaptcha = function() {
+        grecaptcha.render("captcha", {
+            sitekey: "{{recaptchaKey}}",
+            theme: "light",
+            callback: function(response) {
+                console.log(response);
+            }
+        });
+    };
+</script>
+
+<script src="https://www.google.com/recaptcha/api.js?onload=recaptcha&render=explicit" async defer></script>

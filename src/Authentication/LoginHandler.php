@@ -6,13 +6,12 @@ use Aerys;
 use Aerys\{ Request, Response, Server, Session };
 use Amp;
 use Amp\{ Promise, function resolve };
-use Bugcache\{ ConfigKeys, CookieKeys, Encoding\Base64Url, Mustache, SessionKeys };
+use Bugcache\{ Authentication\Captcha\RecaptchaVerifier, ConfigKeys, CookieKeys, Encoding\Base64Url, Mustache, SessionKeys };
 use Bugcache\RequestKeys;
-use Bugcache\Storage\{
-    AuthenticationRepository, ConfigRepository, ConflictException, UserRepository
-};
+use Bugcache\Storage\{ AuthenticationRepository, ConfigRepository, ConflictException, UserRepository };
 
 class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
+    private $recaptchaVerifier;
     private $configRepository;
     private $userRepository;
     private $authenticationRepository;
@@ -25,7 +24,8 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
     /** Key to protect rememberme cookies. */
     private $rememberMeKey;
 
-    public function __construct(ConfigRepository $configRepository, UserRepository $userRepository, AuthenticationRepository $authenticationRepository, LoginManager $loginManager, Mustache $mustacheEngine) {
+    public function __construct(RecaptchaVerifier $recaptchaVerifier, ConfigRepository $configRepository, UserRepository $userRepository, AuthenticationRepository $authenticationRepository, LoginManager $loginManager, Mustache $mustacheEngine) {
+        $this->recaptchaVerifier = $recaptchaVerifier;
         $this->configRepository = $configRepository;
         $this->userRepository = $userRepository;
         $this->authenticationRepository = $authenticationRepository;
@@ -254,7 +254,9 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
             return;
         }
 
-        $response->end($this->mustacheEngine->render("register.mustache"));
+        $response->end($this->mustacheEngine->render("register.mustache", [
+            "recaptchaKey" => BUGCACHE["recaptchaKey"],
+        ]));
     }
 
     public function processRegister(Request $request, Response $response) {
@@ -275,12 +277,38 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
         $username = $body->get("username") ?? "";
         $password = $body->get("password") ?? "";
         $repeat = $body->get("password-repeat") ?? "";
+        $captchaResponse = $body->get("g-recaptcha-response") ?? "";
+
+        if (empty($captchaResponse)) {
+            $response->end($this->mustacheEngine->render("register.mustache", [
+                "error" => "No captcha solved.",
+                "username" => $username,
+                "focusPassword" => true,
+                "recaptchaKey" => BUGCACHE["recaptchaKey"],
+            ]));
+
+            return;
+        }
+
+        $captchaValid = yield $this->recaptchaVerifier->verify($captchaResponse);
+
+        if (!$captchaValid) {
+            $response->end($this->mustacheEngine->render("register.mustache", [
+                "error" => "Incorrect captcha.",
+                "username" => $username,
+                "focusPassword" => true,
+                "recaptchaKey" => BUGCACHE["recaptchaKey"],
+            ]));
+
+            return;
+        }
 
         if ($password !== $repeat) {
             $response->end($this->mustacheEngine->render("register.mustache", [
                 "error" => "Passwords do not match.",
                 "username" => $username,
                 "focusPassword" => true,
+                "recaptchaKey" => BUGCACHE["recaptchaKey"],
             ]));
 
             return;
@@ -304,6 +332,7 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
                 "error" => "Username already taken.",
                 "username" => $username,
                 "selectUsername" => true,
+                "recaptchaKey" => BUGCACHE["recaptchaKey"],
             ]));
 
             return;

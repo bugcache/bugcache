@@ -3,6 +3,9 @@
 const BUGCACHE = [
     "mysql" => "host=localhost;user=bugcache;pass=;db=bugcache",
     "redis" => "tcp://localhost:6379",
+    /* https://developers.google.com/recaptcha/docs/faq */
+    "recaptchaKey" => "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI",
+    "recaptchaSecret" => "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe",
 ];
 
 $host = (new Aerys\Host)
