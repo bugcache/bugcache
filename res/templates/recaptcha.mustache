@@ -1,15 +1,57 @@
-<div id="captcha"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="/screen.css" media="screen">
+</head>
+<body>
+<div class="layout-empty-center">
+    <div class="login">
+        <form class="login-form" action="{{data.action}}" method="POST">
+            {{#data.error}}
+                <div class="login-error">
+                    {{data.error}}
+                </div>
+            {{/data.error}}
 
-<script type="text/javascript">
-    var recaptcha = function() {
-        grecaptcha.render("captcha", {
-            sitekey: "{{recaptchaKey}}",
-            theme: "light",
-            callback: function(response) {
-                console.log(response);
-            }
-        });
-    };
-</script>
+            <p>
+                {{#data.reason}}
+                    {{data.reason}}
+                {{/data.reason}}
+            </p>
 
-<script src="https://www.google.com/recaptcha/api.js?onload=recaptcha&render=explicit" async defer></script>
+            <p>
+                Please solve the following captcha to continue.
+            </p>
+
+            {{#data.inputs}}
+                <input type="hidden" name="{{name}}" value="{{value}}">
+            {{/data.inputs}}
+
+            <div id="captcha"></div>
+
+            <script type="text/javascript">
+                var recaptcha = function () {
+                    grecaptcha.render("captcha", {
+                        sitekey: "{{recaptcha.key}}",
+                        theme: "light",
+                        callback: function (response) {
+                            console.log(response);
+                        }
+                    });
+                };
+            </script>
+
+            <script src="https://www.google.com/recaptcha/api.js?onload=recaptcha&render=explicit" async defer></script>
+
+            <div class="login-submit">
+                <button type="submit" class="login-button">
+                    Continue
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

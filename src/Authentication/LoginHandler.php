@@ -13,7 +13,6 @@ use Bugcache\RequestKeys;
 use Bugcache\Storage\{ AuthenticationRepository, ConfigRepository, ConflictException, UserRepository };
 
 class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
-    private $recaptchaVerifier;
     private $configRepository;
     private $userRepository;
     private $authenticationRepository;
@@ -26,8 +25,7 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
     /** Key to protect rememberme cookies. */
     private $rememberMeKey;
 
-    public function __construct(RecaptchaVerifier $recaptchaVerifier, ConfigRepository $configRepository, UserRepository $userRepository, AuthenticationRepository $authenticationRepository, LoginManager $loginManager, Mustache $mustacheEngine) {
-        $this->recaptchaVerifier = $recaptchaVerifier;
+    public function __construct(ConfigRepository $configRepository, UserRepository $userRepository, AuthenticationRepository $authenticationRepository, LoginManager $loginManager, Mustache $mustacheEngine) {
         $this->configRepository = $configRepository;
         $this->userRepository = $userRepository;
         $this->authenticationRepository = $authenticationRepository;
@@ -154,9 +152,9 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
         $remember = $body->get("remember") ?? "";
 
         $user = yield $this->userRepository->findByName($username);
-        $auth = yield $this->authenticationRepository->findByUser($user->id, AuthenticationRepository::TYPE_PASSWORD);
+        $auth = yield $this->authenticationRepository->findByUser($user["id"], AuthenticationRepository::TYPE_PASSWORD);
 
-        if ($user->id === 0) {
+        if ($user["id"] === 0) {
             $response->end($this->mustacheEngine->render("login.mustache", new TemplateContext($request, [
                 "error" => "User does not exist.",
                 "username" => $username,
@@ -167,14 +165,14 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
         }
 
         if ($auth && password_verify($password, $auth["token"])) {
-            $this->logger->info("Successful password authentication for user '{$user->name}' ({$user->id}).");
+            $this->logger->info("Successful password authentication for user '{$user["name"]}' ({$user["id"]}).");
 
             if (password_needs_rehash($auth["token"], PASSWORD_BCRYPT)) {
                 $newHash = password_hash($password, PASSWORD_BCRYPT);
-                yield $this->authenticationRepository->store($user->id, AuthenticationRepository::TYPE_PASSWORD, $newHash);
+                yield $this->authenticationRepository->store($user["id"], AuthenticationRepository::TYPE_PASSWORD, $newHash);
             }
 
-            yield from $this->loginManager->loginUser($session, $user->id);
+            yield from $this->loginManager->loginUser($session, $user["id"]);
 
             if ($remember) {
                 $rawIdentity = random_bytes(16);
@@ -187,10 +185,10 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
                 $base64Identity = Base64Url::encode($rawIdentity);
                 $base64Token = Base64Url::encode($rawToken);
 
-                yield $this->authenticationRepository->store($user->id, AuthenticationRepository::TYPE_REMEMBER_ME, $base64Token, $base64HashedIdentity, time() + $validTime);
+                yield $this->authenticationRepository->store($user["id"], AuthenticationRepository::TYPE_REMEMBER_ME, $base64Token, $base64HashedIdentity, time() + $validTime);
 
-                $mac = Base64Url::encode(hash_hmac("sha256", "{$user->id}:{$base64Identity}:{$base64Token}", $this->rememberMeKey, true));
-                $cookie = "{$user->id}:{$base64Identity}:{$base64Token}:{$mac}";
+                $mac = Base64Url::encode(hash_hmac("sha256", "{$user["id"]}:{$base64Identity}:{$base64Token}", $this->rememberMeKey, true));
+                $cookie = "{$user["id"]}:{$base64Identity}:{$base64Token}:{$mac}";
                 $cookieFlags = [
                     "Max-Age" => $validTime,
                     "Path" => "/",
@@ -211,7 +209,7 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
             return;
         }
 
-        $this->logger->info("Failed password authentication for user '{$user->name}' ({$user->id}).");
+        $this->logger->info("Failed password authentication for user '{$user["name"]}' ({$user["id"]}).");
 
         $response->end($this->mustacheEngine->render("login.mustache", new TemplateContext($request, [
             "error" => "Wrong password.",
@@ -277,29 +275,6 @@ class LoginHandler implements Aerys\Bootable, Aerys\ServerObserver {
         $username = $body->get("username") ?? "";
         $password = $body->get("password") ?? "";
         $repeat = $body->get("password-repeat") ?? "";
-        $captchaResponse = $body->get("g-recaptcha-response") ?? "";
-
-        if (empty($captchaResponse)) {
-            $response->end($this->mustacheEngine->render("register.mustache", new TemplateContext($request, [
-                "error" => "No captcha solved.",
-                "username" => $username,
-                "focusPassword" => true,
-            ])));
-
-            return;
-        }
-
-        $captchaValid = yield $this->recaptchaVerifier->verify($captchaResponse);
-
-        if (!$captchaValid) {
-            $response->end($this->mustacheEngine->render("register.mustache", new TemplateContext($request, [
-                "error" => "Incorrect captcha.",
-                "username" => $username,
-                "focusPassword" => true,
-            ])));
-
-            return;
-        }
 
         if ($password !== $repeat) {
             $response->end($this->mustacheEngine->render("register.mustache", new TemplateContext($request, [

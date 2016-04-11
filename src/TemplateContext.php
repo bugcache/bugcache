@@ -17,6 +17,7 @@ class TemplateContext {
     public function getContext() {
         return [
             "user" => $this->request->getLocalVar(RequestKeys::USER),
+            "recaptcha" => $this->request->getLocalVar(RequestKeys::RECAPTCHA),
             "data" => $this->context,
         ];
     }

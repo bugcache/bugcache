@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "1b92e3c5f60387c82b679daf4d276ea5",
-    "content-hash": "1efb198299240bc5a16f5a08abb0b692",
+    "hash": "0c814edd1e7d15b0ecb9bbc05f1cd940",
+    "content-hash": "9441ef99e47f1f583edbe29648923d41",
     "packages": [
         {
             "name": "amphp/aerys",
@@ -597,6 +597,47 @@
                 "dns"
             ],
             "time": "2015-04-02 15:42:15"
+        },
+        {
+            "name": "kelunik/rate-limit",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kelunik/rate-limit.git",
+                "reference": "fff3436fb89073125550fd16a11d8a81249ac7b4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kelunik/rate-limit/zipball/fff3436fb89073125550fd16a11d8a81249ac7b4",
+                "reference": "fff3436fb89073125550fd16a11d8a81249ac7b4",
+                "shasum": ""
+            },
+            "require": {
+                "amphp/amp": "^1",
+                "amphp/redis": "^0.2.1"
+            },
+            "require-dev": {
+                "fabpot/php-cs-fixer": "^1.9",
+                "phpunit/phpunit": "^5.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Kelunik\\RateLimit\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Niklas Keller",
+                    "email": "me@kelunik.com"
+                }
+            ],
+            "description": "Asynchronous rate limiting.",
+            "time": "2016-04-09 20:11:18"
         },
         {
             "name": "kelunik/redis-mutex",
@@ -2005,9 +2046,18 @@
             "time": "2016-03-04 07:55:57"
         }
     ],
-    "aliases": [],
+    "aliases": [
+        {
+            "alias": "1.0.0",
+            "alias_normalized": "1.0.0.0",
+            "version": "9999999-dev",
+            "package": "kelunik/rate-limit"
+        }
+    ],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "kelunik/rate-limit": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

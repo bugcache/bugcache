@@ -3,12 +3,17 @@
 namespace Bugcache;
 
 use Aerys;
+use Aerys\Request;
 use Amp\Artax\Client;
 use Amp\Artax\Cookie\NullCookieJar;
 use Amp\Mysql;
 use Amp\Redis;
 use Bugcache\Authentication\{ Captcha\RecaptchaVerifier, LoginHandler, LoginManager };
+use Bugcache\RateLimit\AlwaysCaptchaLimit;
+use Bugcache\RateLimit\IpCaptchaLimit;
+use Bugcache\RateLimit\RateLimitManager;
 use Bugcache\Storage\Mysql\{ AuthenticationRepository, ConfigRepository, UserRepository };
+use Kelunik\RateLimit;
 
 $mysql = new Mysql\Pool(BUGCACHE["mysql"]);
 $redis = new Redis\Client(BUGCACHE["redis"]);
@@ -18,8 +23,10 @@ $mustache = new Mustache(new \Mustache_Engine([
     'loader' => new \Mustache_Loader_FilesystemLoader(__DIR__ . '/../res/templates'),
 ]));
 
+$captchaVerifier = new RecaptchaVerifier(new Client(new NullCookieJar), BUGCACHE["recaptchaSecret"]);
+
 $bugmanager = new BugManager($mysql);
-$loginHandler = new LoginHandler(new RecaptchaVerifier(new Client(new NullCookieJar), BUGCACHE["recaptchaSecret"]), new ConfigRepository($mysql), new UserRepository($mysql), new AuthenticationRepository($mysql), new LoginManager(), $mustache);
+$loginHandler = new LoginHandler(new ConfigRepository($mysql), new UserRepository($mysql), new AuthenticationRepository($mysql), new LoginManager(), $mustache);
 $bugdisplay = new BugDisplay($bugmanager, $mustache);
 
 $api = Aerys\router()
@@ -32,6 +39,11 @@ $api = Aerys\router()
 ;
 
 $ui = Aerys\router()
+    ->use(function(Request $request) {
+        $request->setLocalVar(RequestKeys::RECAPTCHA, [
+            "key" => BUGCACHE["recaptchaKey"]
+        ]);
+    })
     ->use($loginHandler)
     ->get("/", $bugdisplay->index())
     ->get("/recent", $bugdisplay->recent())
@@ -40,7 +52,7 @@ $ui = Aerys\router()
     ->post("/login", [$loginHandler, "processPasswordLogin"])
     ->post("/logout", [$loginHandler, "processLogout"])
     ->get("/register", [$loginHandler, "showRegister"])
-    ->post("/register", [$loginHandler, "processRegister"])
+    ->post("/register", new AlwaysCaptchaLimit($captchaVerifier, $mustache), [$loginHandler, "processRegister"])
     ->use(Aerys\session([
         "driver" => new Aerys\Session\Redis($redis, $mutex)
     ]))

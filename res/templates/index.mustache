@@ -5,6 +5,8 @@
 </head>
 <body>
     {{#user.id}}
+        Logged in as {{user.name}}.
+
         <form action="/logout" method="POST">
             <button type="submit">
                 Logout

@@ -35,7 +35,7 @@ class UserRepository implements Storage\UserRepository {
             return $record;
         }
 
-        return (object) [
+        return [
             "id" => 0,
             "name" => ANONYMOUS_USER,
         ];
