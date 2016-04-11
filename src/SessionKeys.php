@@ -7,4 +7,5 @@ class SessionKeys {
     const LOGIN_TIME = "login:time";
 
     const USERAGENT = "useragent";
+    const LAST_CAPTCHA = "captcha:last";
 }

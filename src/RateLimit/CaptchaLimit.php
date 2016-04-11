@@ -5,8 +5,11 @@ namespace Bugcache\RateLimit;
 use Aerys\ParsedBody;
 use Aerys\Request;
 use Aerys\Response;
+use Aerys\Session;
 use Bugcache\Authentication\Captcha\RecaptchaVerifier;
 use Bugcache\Mustache;
+use Bugcache\RequestKeys;
+use Bugcache\SessionKeys;
 use Bugcache\TemplateContext;
 use Kelunik\RateLimit\RateLimit;
 
@@ -34,6 +37,14 @@ abstract class CaptchaLimit {
     protected abstract function getRateLimitId(Request $request);
 
     private function showCaptcha(Request $request, Response $response): \Generator {
+        /** @var Session $session */
+        $session = $request->getLocalVar(RequestKeys::SESSION);
+
+        if ($session->get(SessionKeys::LAST_CAPTCHA) > time() - 15 * 60) {
+            // Don't ask for a captcha again for 15 minutes if the user already solved a captcha recently.
+            return;
+        }
+
         /** @var ParsedBody $body */
         $body = yield \Aerys\parseBody($request);
 
@@ -68,6 +79,10 @@ abstract class CaptchaLimit {
 
             return;
         }
+
+        yield $session->open();
+        $session->set(SessionKeys::LAST_CAPTCHA, time());
+        yield $session->save();
     }
 
     private function flattenInputs(array $inputs) {
