@@ -13,4 +13,6 @@
 
 **Installation**
 
-*TBD.*
+```
+$ docker-compose up
+```

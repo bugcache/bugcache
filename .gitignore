@@ -1,3 +1,3 @@
 coverage
 vendor
-config.php
+res/config/config.php
