@@ -1,0 +1,3 @@
+CREATE DATABASE IF NOT EXISTS  `bugcache`
+DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+GRANT ALL PRIVILEGES ON bugcache.* TO 'bugcache'@'*' IDENTIFIED BY 'bugcache';

@@ -1,0 +1,32 @@
+version: "2"
+
+services:
+  web:
+    build: .
+
+    command:
+    - /app/vendor/bin/aerys -c /app/res/config/config.sample.php -d
+
+    depends_on:
+    - redis
+    - mysql
+
+    ports:
+    - "8000:8000"
+
+    volumes:
+    - .:/app
+
+  redis:
+    image: redis:3.0
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: bugcache
+      MYSQL_USER: bugcache
+      MYSQL_PASSWORD: bugcache
+      MYSQL_ROOT_PASSWORD: root
+
+    command:
+    - --character-set-server=utf8mb4

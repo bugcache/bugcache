@@ -31,7 +31,7 @@ class UserRepository implements Storage\UserRepository {
         $result = yield $this->mysql->prepare($sql, $params);
 
         if (yield $result->rowCount()) {
-            $record = yield $result->fetchObject();
+            $record = (array) yield $result->fetchObject();
             return $record;
         }
 
