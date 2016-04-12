@@ -21,12 +21,23 @@ class LoginManager {
     public function logoutUser(Session $session): \Generator {
         yield $session->open();
 
-        // Regenerate ID to prevent session fixation
-        yield $session->regenerate();
+        $preserve = [
+            SessionKeys::LAST_CAPTCHA,
+            SessionKeys::USERAGENT,
+        ];
 
-        $session->unset(SessionKeys::LOGIN);
-        $session->unset(SessionKeys::LOGIN_TIME);
-        $session->unset(SessionKeys::LAST_SUDO);
+        $preserveData = [];
+
+        foreach ($preserve as $key) {
+            $preserveData[$key] = $session->get($key);
+        }
+
+        yield $session->destroy();
+        yield $session->open();
+
+        foreach ($preserveData as $key => $value) {
+            $session->set($key, $value);
+        }
 
         yield $session->save();
     }
