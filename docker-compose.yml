@@ -7,7 +7,7 @@ services:
     command:
     - /app/vendor/bin/aerys -c /app/res/config/config.sample.php -d
 
-    depends_on:
+    links:
     - redis
     - mysql
 

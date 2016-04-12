@@ -10,7 +10,7 @@ class LoginManager {
         yield $session->open();
 
         // Regenerate ID to prevent session fixation
-        $session->regenerate();
+        yield $session->regenerate();
 
         $session->set(SessionKeys::LOGIN, $userId);
         $session->set(SessionKeys::LOGIN_TIME, time());
@@ -22,7 +22,7 @@ class LoginManager {
         yield $session->open();
 
         // Regenerate ID to prevent session fixation
-        $session->regenerate();
+        yield $session->regenerate();
 
         $session->unset(SessionKeys::LOGIN);
         $session->unset(SessionKeys::LOGIN_TIME);
