@@ -86,7 +86,12 @@ body {
     cursor: pointer;
 }
 
-.login-button:hover {
+.login-button:disabled {
+    background: #99BDAB;
+    cursor: default;
+}
+
+.login-button:hover:not(:disabled) {
     box-shadow: 0 0 0 1000px rgba(0,0,0,.05) inset;
 }
 

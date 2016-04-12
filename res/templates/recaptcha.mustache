@@ -37,7 +37,8 @@
                         sitekey: "{{recaptcha.key}}",
                         theme: "light",
                         callback: function (response) {
-                            console.log(response);
+                            var button = document.getElementById("captcha-continue");
+                            button.disabled = false;
                         }
                     });
                 };
@@ -46,7 +47,7 @@
             <script src="https://www.google.com/recaptcha/api.js?onload=recaptcha&render=explicit" async defer></script>
 
             <div class="login-submit">
-                <button type="submit" class="login-button">
+                <button type="submit" id="captcha-continue" class="login-button" disabled>
                     Continue
                 </button>
             </div>
