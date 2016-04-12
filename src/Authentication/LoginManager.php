@@ -26,6 +26,7 @@ class LoginManager {
 
         $session->unset(SessionKeys::LOGIN);
         $session->unset(SessionKeys::LOGIN_TIME);
+        $session->unset(SessionKeys::LAST_SUDO);
 
         yield $session->save();
     }
