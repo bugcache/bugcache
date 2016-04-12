@@ -11,7 +11,7 @@ use Amp\Redis;
 use Bugcache\Authentication\{
     Captcha\RecaptchaVerifier, LoginHandler, LoginManager, SudoProtection
 };
-use Bugcache\RateLimit\AlwaysCaptchaLimit;
+use Bugcache\RateLimit\CaptchaProtection;
 use Bugcache\RateLimit\IpCaptchaLimit;
 use Bugcache\RateLimit\RateLimitManager;
 use Bugcache\Storage\Mysql\{ AuthenticationRepository, ConfigRepository, UserRepository };
@@ -54,7 +54,7 @@ $ui = Aerys\router()
     ->post("/login", [$loginHandler, "processPasswordLogin"])
     ->post("/logout", [$loginHandler, "processLogout"])
     ->get("/register", [$loginHandler, "showRegister"])
-    ->post("/register", new AlwaysCaptchaLimit($captchaVerifier, $mustache), [$loginHandler, "processRegister"])
+    ->post("/register", new CaptchaProtection($captchaVerifier, $mustache), [$loginHandler, "processRegister"])
     ->use(Aerys\session([
         "driver" => new Aerys\Session\Redis($redis, $mutex)
     ]))
