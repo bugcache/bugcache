@@ -89,16 +89,16 @@
         },
         {
             "name": "amphp/aerys-session",
-            "version": "v0.1.3",
+            "version": "v0.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/aerys-session.git",
-                "reference": "d394da78286dd7fab481fc655a0e24c9126d2fd7"
+                "reference": "79e837952ae0bfc0983d583fac5b4a5fbad77410"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/aerys-session/zipball/d394da78286dd7fab481fc655a0e24c9126d2fd7",
-                "reference": "d394da78286dd7fab481fc655a0e24c9126d2fd7",
+                "url": "https://api.github.com/repos/amphp/aerys-session/zipball/79e837952ae0bfc0983d583fac5b4a5fbad77410",
+                "reference": "79e837952ae0bfc0983d583fac5b4a5fbad77410",
                 "shasum": ""
             },
             "require": {
@@ -132,7 +132,7 @@
             ],
             "description": "Session management for Aerys server.",
             "homepage": "https://github.com/amphp/aerys-session",
-            "time": "2016-04-05 18:58:24"
+            "time": "2016-04-12 07:44:14"
         },
         {
             "name": "amphp/amp",

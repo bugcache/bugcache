@@ -16,3 +16,9 @@
 ```
 $ docker-compose up
 ```
+
+If you change things, you have to restart Aerys, so the `web` container.
+
+```
+$ docker-compose restart web
+```
