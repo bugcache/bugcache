@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="/screen.css" media="screen">
+</head>
+<body>
+<div class="layout-empty-center">
+    <div class="login">
+        <form class="login-form" action="{{data.action}}" method="POST">
+            {{#data.error}}
+                <div class="login-error">
+                    {{data.error}}
+                </div>
+            {{/data.error}}
+
+            <p>
+                Confirm password to continue
+            </p>
+
+            {{#data.inputs}}
+                <input type="hidden" name="{{name}}" value="{{value}}">
+            {{/data.inputs}}
+
+            <div class="login-input">
+                <label class="login-input-label" for="login-password">Password</label>
+                <input id="login-password" type="password" name="password" autofocus>
+            </div>
+
+            <div class="login-submit">
+                <button type="submit" id="captcha-continue" class="login-button">
+                    Continue
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
