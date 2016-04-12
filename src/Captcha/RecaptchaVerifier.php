@@ -1,6 +1,6 @@
 <?php
 
-namespace Bugcache\Authentication\Captcha;
+namespace Bugcache\Captcha;
 
 use Amp\Artax\ClientException;
 use Amp\Artax\FormBody;

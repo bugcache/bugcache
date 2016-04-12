@@ -6,7 +6,7 @@ use Aerys\ParsedBody;
 use Aerys\Request;
 use Aerys\Response;
 use Aerys\Session;
-use Bugcache\Authentication\Captcha\RecaptchaVerifier;
+use Bugcache\Captcha\RecaptchaVerifier;
 use Bugcache\Mustache;
 use Bugcache\RequestKeys;
 use Bugcache\SessionKeys;
@@ -27,7 +27,11 @@ abstract class CaptchaLimit {
     }
 
     public function __invoke(Request $request, Response $response) {
-        $current = yield $this->rateLimit->increment($this->getRateLimitId($request));
+        $id = $this->getRateLimitId($request);
+        $path = strtok($request->getUri(), "?");
+        $method = $request->getMethod();
+
+        $current = yield $this->rateLimit->increment("captcha:{$id}:{$method}:{$path}");
 
         if ($current > $this->limit) {
             yield from $this->showCaptcha($request, $response);

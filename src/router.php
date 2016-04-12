@@ -8,12 +8,9 @@ use Amp\Artax\Client;
 use Amp\Artax\Cookie\NullCookieJar;
 use Amp\Mysql;
 use Amp\Redis;
-use Bugcache\Authentication\{
-    Captcha\RecaptchaVerifier, LoginHandler, LoginManager, SudoProtection
-};
+use Bugcache\Authentication\{ LoginHandler, LoginManager };
+use Bugcache\Captcha\RecaptchaVerifier;
 use Bugcache\RateLimit\CaptchaProtection;
-use Bugcache\RateLimit\IpCaptchaLimit;
-use Bugcache\RateLimit\RateLimitManager;
 use Bugcache\Storage\Mysql\{ AuthenticationRepository, ConfigRepository, UserRepository };
 use Kelunik\RateLimit;
 

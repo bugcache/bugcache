@@ -5,7 +5,7 @@ namespace Bugcache\RateLimit;
 use Aerys\Request;
 use Amp\Promise;
 use Amp\Success;
-use Bugcache\Authentication\Captcha\RecaptchaVerifier;
+use Bugcache\Captcha\RecaptchaVerifier;
 use Bugcache\Mustache;
 use Kelunik\RateLimit\RateLimit;
 
