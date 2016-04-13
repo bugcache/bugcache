@@ -6,6 +6,32 @@ const BUGCACHE = [
     /* @see https://developers.google.com/recaptcha/docs/faq */
     "recaptchaKey" => "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI",
     "recaptchaSecret" => "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe",
+	"bugfields" => [
+		"type" => [
+			"name" => "Bug type",
+			"type" => Bugcache\BugManager::ENUM,
+			"required" => 1,
+			"values" => [
+				[
+					"name" => "Bug",
+				],
+				[
+					"name" => "Security Bug",
+					"secure" => true,
+					"default" => true,
+				],
+			]
+		],
+		"assignee" => [
+			"name" => "Assignee",
+			"type" => Bugcache\BugManager::USER,
+			"multi" => true,
+		],
+		"system" => [
+			"name" => "Operating System",
+			"type" => Bugcache\BugManager::TEXT,
+		],
+	]
 ];
 
 $host = (new Aerys\Host)

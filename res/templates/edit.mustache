@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Bugcache</title>
+	</head>
+	<body>
+		<form action="" method="post">
+			{{#data.id}}
+				Edit bug <a href="/{{data.id}}">#{{data.id}}</a>:
+			{{/data.id}}
+			{{^data.id}}
+				Report a bug:
+			{{/data.id}}
+			<div>Title: <input type="text" name="title" value="{{data.title}}" /></div>
+			{{#data.attributes}}
+				<div>{{name}}:
+					{{#values.0}}
+						<select name="{{field}}">
+							{{#values}}
+								<option {{#default}}selected="selected"{{/default}}>{{name}}</option>
+							{{/values}}
+						</select>
+					{{/values.0}}
+					{{^values.0}}
+						<input type="{{type}}" name="{{field}}" value="{{value.0}}" />
+					{{/values.0}}
+				</div>
+			{{/data.attributes}}
+			<textarea name="data">{{data.data}}</textarea><br>
+			<input type="submit" value="Report" />
+		</form>
+	</body>
+</html>
