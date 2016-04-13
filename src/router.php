@@ -24,7 +24,7 @@ $mustache = new Mustache(new \Mustache_Engine([
 
 $captchaVerifier = new RecaptchaVerifier(new Client(new NullCookieJar), BUGCACHE["recaptchaSecret"]);
 
-$bugmanager = new BugManager($mysql);
+$bugmanager = new BugManager(BUGCACHE["bugfields"], $mysql);
 $loginHandler = new LoginHandler(new ConfigRepository($mysql), new UserRepository($mysql), new AuthenticationRepository($mysql), new LoginManager(), $mustache);
 $bugdisplay = new BugDisplay($bugmanager, $mustache);
 
@@ -47,6 +47,9 @@ $ui = Aerys\router()
     ->get("/", $bugdisplay->index())
     ->get("/recent", $bugdisplay->recent())
     ->get("/{id:[1-9][0-9]*}", $bugdisplay->displayBug())
+    ->get("/new", $bugdisplay->editBug())
+    ->post("/new", $bugdisplay->submitBug())
+    ->get("/edit/{id:[1-9][0-9]*}", $bugdisplay->editBug())
     ->get("/login", [$loginHandler, "showLogin"])
     ->post("/login", [$loginHandler, "processPasswordLogin"])
     ->post("/logout", [$loginHandler, "processLogout"])
