@@ -53,6 +53,9 @@ class SudoProtection {
             $inputs = $body->getAll()["fields"];
             $inputs = $this->flattenInputs($inputs);
 
+            $response->setHeader("cache-control", "no-cache, no-store");
+            $response->setHeader("pragma", "no-cache");
+
             $response->end($this->mustache->render("sudo.mustache", new TemplateContext($request, [
                 "inputs" => $inputs,
             ])));
@@ -79,6 +82,9 @@ class SudoProtection {
         $inputs = array_filter($inputs, function($input) {
             return $input["name"] !== "password";
         });
+
+        $response->setHeader("cache-control", "no-cache, no-store");
+        $response->setHeader("pragma", "no-cache");
 
         $response->end($this->mustache->render("sudo.mustache", new TemplateContext($request, [
             "inputs" => $inputs,

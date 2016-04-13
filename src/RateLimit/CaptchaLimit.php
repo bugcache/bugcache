@@ -59,6 +59,9 @@ abstract class CaptchaLimit {
             $inputs = $body->getAll()["fields"];
             $inputs = $this->flattenInputs($inputs);
 
+            $response->setHeader("cache-control", "no-cache, no-store");
+            $response->setHeader("pragma", "no-cache");
+
             $response->end($this->mustache->render("recaptcha.mustache", new TemplateContext($request, [
                 "inputs" => $inputs,
             ])));
@@ -75,6 +78,9 @@ abstract class CaptchaLimit {
             $inputs = array_filter($inputs, function($input) {
                 return $input["name"] !== "g-recaptcha-response";
             });
+
+            $response->setHeader("cache-control", "no-cache, no-store");
+            $response->setHeader("pragma", "no-cache");
 
             $response->end($this->mustache->render("recaptcha.mustache", new TemplateContext($request, [
                 "inputs" => $inputs,
