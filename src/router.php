@@ -64,6 +64,10 @@ $ui = Aerys\router()
             $headers["x-ua-compatible"] = ["IE=Edge,chrome=1"];
             $headers["x-content-type-options"] = ["nosniff"];
 
+            if ($request->client->isEncrypted) {
+                $headers["strict-transport-security"] = ["max-age=31536000"];
+            }
+
             return $headers;
         }
     })
