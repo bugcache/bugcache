@@ -143,7 +143,7 @@ class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 			yield $conn->prepare("INSERT INTO bugattrs (bug, attribute, value) VALUES (?, ?, ?)" . str_repeat(", (?, ?, ?)", count($add) / 3 - 1), $add);
 		}
 		
-		$conn->query("COMMIT");
+		yield $conn->query("COMMIT");
 
 		return ["id" => $id, "success" => true];
 	}
