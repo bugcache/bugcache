@@ -5,6 +5,17 @@ body {
     font-family: "Lato", sans-serif;
 }
 
+a {
+    color: #06c;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    color: #07e;
+    text-decoration: underline;
+}
+
 .layout-empty-center {
     display: flex;
     box-sizing: border-box;
@@ -129,4 +140,46 @@ body {
 
 .login #captcha {
     margin-bottom: 20px;
+}
+
+.body {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    flex-direction: column;
+}
+
+.header {
+    height: 50px;
+    background: #2c8cec;
+}
+
+.content {
+    flex: 1 1 auto;
+    padding: 20px;
+    overflow-y: scroll;
+}
+
+.header-item {
+    display: inline-block;
+    min-width: 50px;
+    height: 50px;
+    text-align: center;
+    color: #fff;
+    line-height: 50px;
+}
+
+.list {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.list-item {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.list-item:first-child {
+    border-top: 1px solid #ddd;
 }

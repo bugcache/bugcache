@@ -2,14 +2,29 @@
 <html>
 	<head>
 		<title>Bugcache</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+        <link rel="stylesheet" href="/screen.css" media="screen">
 	</head>
-	<body>
-		<div><a href="/">Back to main page</a></div>
-		{{#data.data}}
-			<a href="/{{id}}">#{{id}} &mdash; {{title}}</a><br>
-		{{/data.data}}
-		{{^data.data}}
-			No bugs there...
-		{{/data.data}}
+	<body class="body">
+		<div class="header">
+            <a href="/" class="header-item">
+                <i class="fa fa-arrow-left"></i>
+            </a>
+        </div>
+
+        <div class="content">
+            <ul class="list">
+                {{#data.data}}
+                    <li class="list-item">
+                        <a href="/{{id}}">#{{id}} &ndash; {{title}}</a>
+                    </li>
+                {{/data.data}}
+                {{^data.data}}
+                    <li class="list-empty">
+                        No bugs there...
+                    </li>
+                {{/data.data}}
+            </ul>
+        </div>
 	</body>
 </html>
