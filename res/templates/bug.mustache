@@ -7,9 +7,9 @@
 		<a href="/recent">Recent bugs</a>
 		<a href="/{{data.id}}/edit">Edit this bug</a>
 		<h2>#{{data.id}} &mdash; {{data.title}}</h2>
-		<div>Submitter: {{submittername}}</div>
+		<div>Submitter: {{data.submittername}}</div>
 		{{#data.attributes}}
-			<div>{{name}}: {{value.0}}</div>
+			<div>{{name}}: <ul>{{#value}}<li>{{value}}</li>{{/value}}</ul></div>
 		{{/data.attributes}}
 		{{data.data}}
 	</body>

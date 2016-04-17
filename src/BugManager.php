@@ -76,7 +76,6 @@ class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 			if (count($attrs) < ($info["required"] ?? 0)) {
 				return null;
 			}
-
 			foreach ($attrs as $attr) {
 				switch ($info["type"]) {
 					case self::USER:
@@ -88,16 +87,17 @@ class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 									}
 								});
 							});
-						}
-						$promises[] = \Amp\pipe($this->db->prepare("SELECT id FROM users WHERE name = ?", [$attr]), function($val) use (&$attr) {
-							return \Amp\pipe($val->fetchObject(), function($row) use (&$attr) {
-								if ($row) {
-									$attr = $row->id;
-								} else {
-									return 1; // error, add identifier for message
-								}
+						} else {
+							$promises[] = \Amp\pipe($this->db->prepare("SELECT id FROM users WHERE name = ?", [$attr]), function ($val) use (&$attr) {
+								return \Amp\pipe($val->fetchObject(), function ($row) use (&$attr) {
+									if ($row) {
+										$attr = $row->id;
+									} else {
+										return 1; // error, add identifier for message
+									}
+								});
 							});
-						});
+						}
 						break;
 					case self::INT:
 						if (($attr = filter_var($attr, FILTER_VALIDATE_INT)) === false) {
@@ -129,12 +129,14 @@ class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 		if ($id = $routed["id"] ?? 0) {
 			$info = yield $conn->prepare("UPDATE bugs SET title = :title, data = :data WHERE id = :id", ["id" => $id, "title" => $title, "data" => $data]);
 			if (!$info->affectedRows) {
-				return null;
+				preg_match('(matched: (\d))i', $info->statusInfo, $m);
+				if (!$m[1]) {
+					return null;
+				}
 			}
 			yield $conn->prepare("DELETE FROM bugattrs WHERE bug = :id", ["id" => $id]);
 		} else {
-			$session = $req->getLocalVar(RequestKeys::SESSION);
-			$uid = $session->get(SessionKeys::LOGIN);
+			$uid = $req->getLocalVar(RequestKeys::USER);
 			$info = yield $conn->prepare("INSERT INTO bugs (title, data, submitter) VALUES (:title, :data, :submitter)", ["title" => $title, "data" => $data, "submitter" => $uid]);
 			$id = $info->insertId;
 		}

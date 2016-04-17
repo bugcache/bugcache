@@ -49,6 +49,9 @@ class BugDisplay {
 			$attributes = $data->attributes;
 			$data->attributes = [];
 			foreach ($attributes as $attr => $value) {
+				foreach ($value["value"] as &$val) {
+					$val = ["value" => $val];
+				}
 				$data->attributes[] = $value + ["field" => $attr];
 			}
 
@@ -59,7 +62,10 @@ class BugDisplay {
 
 	public function submitBug() {
 		return function (Request $req, Response $res, $routerInfo) {
-			$data = yield from $this->manager->submit($req, $routerInfo);
+			$body = yield \Aerys\parseBody($req);
+			if ($body->get("_add") == "") {
+				$data = yield from $this->manager->submit($req, $routerInfo);
+			}
 			if ($data["success"] ?? false) {
 				$res->setStatus(302);
 				$res->addHeader("Location", "/{$data['id']}");
@@ -88,6 +94,7 @@ class BugDisplay {
 			}
 
 			$body = yield \Aerys\parseBody($req);
+			$add = $body->get("_add");
 
 			if (($title = $body->get("title")) !== null) {
 				$data->title = $title;
@@ -100,19 +107,25 @@ class BugDisplay {
 			$data->attributes = [];
 			foreach ($fields as $attr => $field) {
 				if ($values = $body->getArray($attr)) {
+					// prevent values with multiple allowed arguments from becoming an ever growing list on each submit
+					if (count($values) > 1 && end($values) == "" && $add != $attr) {
+						unset($values[key($values)]);
+					}
 					$attributes[$attr]["value"] = $values;
 				}
 				if (isset($attributes[$attr])) {
 					$field += $attributes[$attr];
 					if (is_array($field["values"] ?? null)) {
 						foreach ($field["values"] as &$value) {
-							unset($value["default"]);
-							if (in_array($value["name"], $field["value"])) {
-								$value["default"] = true;
-							}
+							$value["default"] = in_array($value["name"], $field["value"]);
+						}
+					} else {
+						foreach ($field["value"] as &$value) {
+							$value = ["value" => $value];
 						}
 					}
 				}
+
 				$field["type"] = self::TYPE_MAP[$field["type"]] ?? "text";
 				$data->attributes[] = $field + ["field" => $attr];
 			}

@@ -22,7 +22,14 @@
 						</select>
 					{{/values.0}}
 					{{^values.0}}
-						<input type="{{type}}" name="{{field}}" value="{{value.0}}" />
+						<ul>
+							{{#value}}
+								<li><input type="{{type}}" name="{{field}}" value="{{value}}" /></li>
+							{{/value}}
+							{{#multi}}
+								<li><input type="{{type}}" name="{{field}}" /> <button type="submit" name="_add" value="{{field}}">+</button></li>
+							{{/multi}}
+						</ul>
 					{{/values.0}}
 				</div>
 			{{/data.attributes}}
