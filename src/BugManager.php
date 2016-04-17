@@ -22,6 +22,8 @@ class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 	private $delete;
 	
 	public function __construct(array $fields, mysql\Pool $db) {
+		$fields["data"]["required"] = 1;
+		$fields["title"]["required"] = 1;
 		$this->fields = $fields;
 		$this->db = $db;
 	}
@@ -57,13 +59,6 @@ class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 	public function submit(Request $req, array $routed = []) {
 		$body = yield Aerys\parseBody($req);
 
-		$title = $body->get("title");
-		$data = $body->get("data");
-
-		if (!isset($title, $data)) {
-			return null;
-		}
-
 		$add = [];
 		$promises = [];
 		foreach ($this->fields as $field => $info) {
@@ -77,7 +72,7 @@ class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 				return null;
 			}
 			foreach ($attrs as $attr) {
-				switch ($info["type"]) {
+				switch ($info["type"] ?? self::TEXT) {
 					case self::USER:
 						if (filter_var($attr, FILTER_VALIDATE_INT)) {
 							$promises[] = \Amp\pipe($this->db->prepare("SELECT id FROM users WHERE id = ?", [$attr]), function($val) {
@@ -110,11 +105,27 @@ class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 							}
 						}
 						return null;
+					default:
+						if (!preg_match("//u", $attr)) {
+							return null; // invalid UTF-8
+						}
+						if (isset($info["maxlen"]) && \strlen($attr) > $info["maxlen"]) {
+							return null;
+						}
+						if (isset($info["minlen"]) && \strlen($attr) < $info["minlen"]) {
+							return null;
+						}
 				}
 
-				$add[] = &$id;
-				$add[] = $field;
-				$add[] = &$attr;
+				if ($field == "title") {
+					$title = &$attr;
+				} elseif ($field == "data") {
+					$data = &$attr;
+				} else {
+					$add[] = &$id;
+					$add[] = $field;
+					$add[] = &$attr;
+				}
 				unset($attr);
 			}
 		}
@@ -136,7 +147,7 @@ class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 			}
 			yield $conn->prepare("DELETE FROM bugattrs WHERE bug = :id", ["id" => $id]);
 		} else {
-			$uid = $req->getLocalVar(RequestKeys::USER);
+			$uid = $req->getLocalVar(RequestKeys::USER)["id"];
 			$info = yield $conn->prepare("INSERT INTO bugs (title, data, submitter) VALUES (:title, :data, :submitter)", ["title" => $title, "data" => $data, "submitter" => $uid]);
 			$id = $info->insertId;
 		}

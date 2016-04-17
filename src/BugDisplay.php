@@ -100,12 +100,16 @@ class BugDisplay {
 				$data->title = $title;
 			}
 			if (($title = $body->get("data")) !== null) {
-				$data->title = $title;
+				$data->data = $title;
 			}
 
 			$attributes = $data->attributes;
 			$data->attributes = [];
 			foreach ($fields as $attr => $field) {
+				if ($attr == "data" || $attr == "title") {
+					continue;
+				}
+
 				if ($values = $body->getArray($attr)) {
 					// prevent values with multiple allowed arguments from becoming an ever growing list on each submit
 					if (count($values) > 1 && end($values) == "" && $add != $attr) {
@@ -126,7 +130,7 @@ class BugDisplay {
 					}
 				}
 
-				$field["type"] = self::TYPE_MAP[$field["type"]] ?? "text";
+				$field["type"] = isset($field["type"]) ? self::TYPE_MAP[$field["type"]] ?? "text" : "text";
 				$data->attributes[] = $field + ["field" => $attr];
 			}
 

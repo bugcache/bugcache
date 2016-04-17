@@ -7,6 +7,13 @@ const BUGCACHE = [
     "recaptchaKey" => "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI",
     "recaptchaSecret" => "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe",
 	"bugfields" => [
+		"title" => [
+			"minlen" => 1,
+			"maxlen" => 255,
+		],
+		"data" => [
+			"minlen" => 1,
+		],
 		"type" => [
 			"name" => "Bug type",
 			"type" => Bugcache\BugManager::ENUM,
