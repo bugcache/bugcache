@@ -24,7 +24,7 @@ $mustache = new Mustache(new \Mustache_Engine([
 
 $captchaVerifier = new RecaptchaVerifier(new Client(new NullCookieJar), BUGCACHE["recaptchaSecret"]);
 
-$bugmanager = new BugManager(BUGCACHE["bugfields"], $mysql);
+$bugmanager = new BugManager(BUGCACHE["bugfields"] ?? [], $mysql);
 $loginHandler = new LoginHandler(new ConfigRepository($mysql), new UserRepository($mysql), new AuthenticationRepository($mysql), new LoginManager(), $mustache);
 $bugdisplay = new BugDisplay($bugmanager, $mustache);
 

@@ -18,33 +18,32 @@ $host = (new Aerys\Host)
     ->expose("*", 8000)
     ->use(require __DIR__ . "/../../src/router.php");
 
-$boot = function () {
+$boot = function () use ($logger) {
     $start = time();
 
-    echo "Waiting for MySQL to accept connections ...";
+    $logger->info("Waiting for MySQL to accept connections ...");
 
     do {
         try {
             yield Socket\connect("tcp://mysql:3306");
 
+            $logger->info("MySQL ready to accept connections");
             break;
         } catch (Socket\SocketException $e) {
             yield new Pause(1000);
-
-            echo ".";
         }
     } while (time() < $start + 30);
 
-    echo PHP_EOL;
-
     if (time() > $start + 30) {
-        throw new RuntimeException("MySQL server unavailable.");
+        throw new RuntimeException("MySQL server unavailable");
     }
 
     $mysql = new Pool(BUGCACHE["mysql"]);
 
     yield $mysql->query(file_get_contents(__DIR__ . "/../database/schema.sql"));
     yield $mysql->query(file_get_contents(__DIR__ . "/../database/init.sql"));
+
+    $logger->info("MySQL schema complete");
 };
 
 return resolve($boot());
