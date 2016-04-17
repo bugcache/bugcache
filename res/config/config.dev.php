@@ -40,10 +40,12 @@ $boot = function () use ($logger) {
 
     $mysql = new Pool(BUGCACHE["mysql"]);
 
-    yield $mysql->query(file_get_contents(__DIR__ . "/../database/schema.sql"));
-    yield $mysql->query(file_get_contents(__DIR__ . "/../database/init.sql"));
-
-    $logger->info("MySQL schema complete");
+    if (getenv("DROP_SCHEMA")) {
+        $logger->info("Importing schema ...");
+        yield $mysql->query(file_get_contents(__DIR__ . "/../database/schema.sql"));
+        yield $mysql->query(file_get_contents(__DIR__ . "/../database/init.sql"));
+        $logger->info("Schema complete");
+    }
 };
 
 return resolve($boot());
