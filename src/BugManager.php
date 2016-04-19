@@ -38,7 +38,7 @@ class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 				"listDesc" => $this->db->prepare("SELECT id, title FROM bugs WHERE id < ? ORDER BY id DESC LIMIT ?"),
 				"listAsc" => $this->db->prepare("SELECT id, title FROM bugs WHERE id > ? ORDER BY id ASC LIMIT ?"),
 				"fetchBug" => $this->db->prepare("SELECT title, data, submitter, name AS submittername FROM bugs JOIN users ON (users.id = submitter) WHERE bugs.id = ?"),
-				"fetchAttrs" => $this->db->prepare("SELECT attribute, value FROM bugattrs WHERE bug = ?"),
+				"fetchAttrs" => $this->db->prepare("SELECT attribute, value, name AS username FROM bugattrs LEFT JOIN users ON (type = ".self::USER." AND id = value) WHERE bug = ?"),
 				"delete" => $this->db->prepare("DELETE FROM bugs WHERE id = ?"),
 			])->when(function($e, $data) {
 				if (!$e) {
@@ -72,7 +72,8 @@ class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 				return null;
 			}
 			foreach ($attrs as $attr) {
-				switch ($info["type"] ?? self::TEXT) {
+				$type = $info["type"] ?? self::TEXT;
+				switch ($type) {
 					case self::USER:
 						if (filter_var($attr, FILTER_VALIDATE_INT)) {
 							$promises[] = \Amp\pipe($this->db->prepare("SELECT id FROM users WHERE id = ?", [$attr]), function($val) {
@@ -124,6 +125,7 @@ class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 				} else {
 					$add[] = &$id;
 					$add[] = $field;
+					$add[] = $type;
 					$add[] = &$attr;
 				}
 				unset($attr);
@@ -153,7 +155,8 @@ class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 		}
 
 		if ($add) {
-			yield $conn->prepare("INSERT INTO bugattrs (bug, attribute, value) VALUES (?, ?, ?)" . str_repeat(", (?, ?, ?)", count($add) / 3 - 1), $add);
+			// store type in denormalized format for quick fetches
+			yield $conn->prepare("INSERT INTO bugattrs (bug, attribute, type, value) VALUES (?, ?, ?, ?)" . str_repeat(", (?, ?, ?, ?)", count($add) / 4 - 1), $add);
 		}
 		
 		yield $conn->query("COMMIT");
@@ -199,9 +202,13 @@ class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 			if (!isset($bugData->attributes[$name])) {
 				$bugData->attributes[$name] = $this->fields[$name];
 			}
-			$bugData->attributes[$name]["value"][] = $attr->value;
+			$value = ["value" => $attr->value];
+			if (isset($attr->username)) {
+				$value["username"] = $attr->username;
+			}
+			$bugData->attributes[$name]["value"][] = $value;
 		}
-		
+
 		return $bugData;
 
 	}

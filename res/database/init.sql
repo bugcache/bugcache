@@ -27,6 +27,7 @@ DROP TABLE IF EXISTS `bugattrs`;
 CREATE TABLE `bugattrs` (
   `bug` int(11) NOT NULL,
   `attribute` varchar(255) NOT NULL,
+  `type` tinyint(3) NOT NULL,
   `value` text NOT NULL,
   KEY `bugattr` (`bug`,`attribute`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

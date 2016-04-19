@@ -50,7 +50,9 @@ class BugDisplay {
 			$data->attributes = [];
 			foreach ($attributes as $attr => $value) {
 				foreach ($value["value"] as &$val) {
-					$val = ["value" => $val];
+					if (isset($val["username"])) {
+						$val["value"] = $val["username"];
+					}
 				}
 				$data->attributes[] = $value + ["field" => $attr];
 			}
@@ -125,7 +127,9 @@ class BugDisplay {
 						}
 					} else {
 						foreach ($field["value"] as &$value) {
-							$value = ["value" => $value];
+							if (isset($value["username"])) {
+								$value["value"] = $value["username"];
+							}
 						}
 					}
 				}
