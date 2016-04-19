@@ -3,53 +3,28 @@
 namespace Bugcache;
 
 use Amp\Mysql as mysql;
-use Aerys\{ Request, Server };
-use Aerys as Aerys;
+use Aerys\Request;
+use function Aerys\parseBody;
 use Amp as Amp;
 
-class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
+class BugManager {
 	const USER = 1;
 	const TEXT = 2;
 	const INT = 3;
 	const ENUM = 4;
 	
-	private $db;
+	private $bug;
 	private $fields;
-	private $listDesc;
-	private $listAsc;
-	private $fetchBug;
-	private $fetchAttrs;
-	private $delete;
+	private $user;
 	
-	public function __construct(array $fields, mysql\Pool $db) {
+	public function __construct(array $fields, Storage\BugRepository $bug, Storage\UserRepository $user) {
 		$fields["data"]["required"] = 1;
 		$fields["title"]["required"] = 1;
+		$fields["title"]["minlen"] = $fields["title"]["minlen"] ?? 1;
+		
 		$this->fields = $fields;
-		$this->db = $db;
-	}
-	
-	public function boot(Server $server, Aerys\Logger $logger) {
-		$server->attach($this);
-	}
-
-	public function update(Server $server): Amp\Promise {
-		if ($server->state() == Server::STARTING) {
-			return Amp\all([
-				"listDesc" => $this->db->prepare("SELECT id, title FROM bugs WHERE id < ? ORDER BY id DESC LIMIT ?"),
-				"listAsc" => $this->db->prepare("SELECT id, title FROM bugs WHERE id > ? ORDER BY id ASC LIMIT ?"),
-				"fetchBug" => $this->db->prepare("SELECT title, data, submitter, name AS submittername FROM bugs JOIN users ON (users.id = submitter) WHERE bugs.id = ?"),
-				"fetchAttrs" => $this->db->prepare("SELECT attribute, value, name AS username FROM bugattrs LEFT JOIN users ON (type = ".self::USER." AND id = value) WHERE bug = ?"),
-				"delete" => $this->db->prepare("DELETE FROM bugs WHERE id = ?"),
-			])->when(function($e, $data) {
-				if (!$e) {
-					foreach ($data as $key => $val) {
-						$this->$key = $val;
-					}
-				}
-			});
-		}
-
-		return new Amp\Success;
+		$this->bug = $bug;
+		$this->user = $user;
 	}
 	
 	public function getFields() {
@@ -57,7 +32,7 @@ class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 	}
 	
 	public function submit(Request $req, array $routed = []) {
-		$body = yield Aerys\parseBody($req);
+		$body = yield parseBody($req);
 
 		$add = [];
 		$promises = [];
@@ -76,22 +51,18 @@ class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 				switch ($type) {
 					case self::USER:
 						if (filter_var($attr, FILTER_VALIDATE_INT)) {
-							$promises[] = \Amp\pipe($this->db->prepare("SELECT id FROM users WHERE id = ?", [$attr]), function($val) {
-								return \Amp\pipe($val->rowCount(), function($count) {
-									if ($count == 0) {
-										return 1; // error, add identifier for message
-									}
-								});
+							$promises[] = \Amp\pipe($this->user->findById($attr), function($user) {
+								if (!$user["id"]) {
+									return 1; // error, add identifier for message
+								}
 							});
 						} else {
-							$promises[] = \Amp\pipe($this->db->prepare("SELECT id FROM users WHERE name = ?", [$attr]), function ($val) use (&$attr) {
-								return \Amp\pipe($val->fetchObject(), function ($row) use (&$attr) {
-									if ($row) {
-										$attr = $row->id;
-									} else {
-										return 1; // error, add identifier for message
-									}
-								});
+							$promises[] = \Amp\pipe($this->user->findByName($attr), function ($user) use (&$attr) {
+								if ($user["id"]) {
+									$attr = $user["id"];
+								} else {
+									return 1; // error, add identifier for message
+								}
 							});
 						}
 						break;
@@ -123,10 +94,9 @@ class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 				} elseif ($field == "data") {
 					$data = &$attr;
 				} else {
-					$add[] = &$id;
-					$add[] = $field;
-					$add[] = $type;
-					$add[] = &$attr;
+					$add["attribute"][] = $field;
+					$add["type"][] = $type;
+					$add["value"][] = &$attr;
 				}
 				unset($attr);
 			}
@@ -136,30 +106,7 @@ class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 			return null;
 		}
 
-		$conn = yield $this->db->getConnection();
-		$conn->query("START TRANSACTION");
-		
-		if ($id = $routed["id"] ?? 0) {
-			$info = yield $conn->prepare("UPDATE bugs SET title = :title, data = :data WHERE id = :id", ["id" => $id, "title" => $title, "data" => $data]);
-			if (!$info->affectedRows) {
-				preg_match('(matched: (\d))i', $info->statusInfo, $m);
-				if (!$m[1]) {
-					return null;
-				}
-			}
-			yield $conn->prepare("DELETE FROM bugattrs WHERE bug = :id", ["id" => $id]);
-		} else {
-			$uid = $req->getLocalVar(RequestKeys::USER)["id"];
-			$info = yield $conn->prepare("INSERT INTO bugs (title, data, submitter) VALUES (:title, :data, :submitter)", ["title" => $title, "data" => $data, "submitter" => $uid]);
-			$id = $info->insertId;
-		}
-
-		if ($add) {
-			// store type in denormalized format for quick fetches
-			yield $conn->prepare("INSERT INTO bugattrs (bug, attribute, type, value) VALUES (?, ?, ?, ?)" . str_repeat(", (?, ?, ?, ?)", count($add) / 4 - 1), $add);
-		}
-		
-		yield $conn->query("COMMIT");
+		$id = yield $this->bug->storeBug($routed["id"] ?? 0, $title, $data, $req->getLocalVar(RequestKeys::USER)["id"], $add);
 
 		return ["id" => $id, "success" => true];
 	}
@@ -167,9 +114,7 @@ class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 	public function recent(Request $req) {
 		$num = (int) ($req->getParam("num") ?? 100);
 
-		$result = yield $this->listDesc->execute([PHP_INT_MAX, $num]);
-
-		return yield $result->fetchObjects();
+		return yield $this->bug->listDesc(PHP_INT_MAX, $num);
 	}
 	
 	public function list(Request $req) {
@@ -177,26 +122,21 @@ class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 		$last = (int) ($req->getParam("last") ?? 0);
 		
 		if ($req->getParam("order") == "desc") {
-			$stmt = $this->listDesc;
+			return yield $this->bug->listDesc($last, $num);
 		} else {
-			$stmt = $this->listAsc;
+			return yield $this->bug->listAsc($last, $num);
 		}
-		
-		$result = yield $stmt->execute([$last, $num]);
-
-		return yield $result->fetchObjects();
 	}
 	
 	public function fetchBug(Request $req, array $routed) {
 		$id = (int) $routed["id"];
 		
-		$result = yield $this->fetchBug->execute([$id]);
-		if (!$bugData = yield $result->fetchObject()) {
+		if (!$bugData = yield $this->bug->fetchBug($id)) {
 			return ["error" => "no such bug"];
 		}
 
 		$bugData->attributes = [];
-		$attrs = yield (yield $this->fetchAttrs->execute([$id]))->fetchObjects();
+		$attrs = yield $this->bug->fetchAttrs($id);
 		foreach ($attrs as $attr) {
 			$name = $attr->attribute;
 			if (!isset($bugData->attributes[$name])) {
@@ -216,7 +156,7 @@ class BugManager implements Aerys\ServerObserver, Aerys\Bootable {
 	public function delete(Request $req, array $routed) {
 		$id = (int) $routed["id"];
 		
-		$info = yield $this->delete->execute([$id]);
+		$info = yield $this->bug->delete($id);
 		
 		if ($info->affectedRows) {
 			return ["deleted" => true];

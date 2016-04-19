@@ -11,7 +11,7 @@ use Amp\Redis;
 use Bugcache\Authentication\{ LoginHandler, LoginManager };
 use Bugcache\Captcha\RecaptchaVerifier;
 use Bugcache\RateLimit\CaptchaProtection;
-use Bugcache\Storage\Mysql\{ AuthenticationRepository, ConfigRepository, UserRepository };
+use Bugcache\Storage\Mysql\{ AuthenticationRepository, BugRepository, ConfigRepository, UserRepository };
 use Kelunik\RateLimit;
 
 $mysql = new Mysql\Pool(BUGCACHE["mysql"]);
@@ -24,8 +24,10 @@ $mustache = new Mustache(new \Mustache_Engine([
 
 $captchaVerifier = new RecaptchaVerifier(new Client(new NullCookieJar), BUGCACHE["recaptchaSecret"]);
 
-$bugmanager = new BugManager(BUGCACHE["bugfields"] ?? [], $mysql);
-$loginHandler = new LoginHandler(new ConfigRepository($mysql), new UserRepository($mysql), new AuthenticationRepository($mysql), new LoginManager(), $mustache);
+$user = new UserRepository($mysql);
+
+$bugmanager = new BugManager(BUGCACHE["bugfields"] ?? [], new BugRepository($mysql), $user);
+$loginHandler = new LoginHandler(new ConfigRepository($mysql), $user, new AuthenticationRepository($mysql), new LoginManager(), $mustache);
 $bugdisplay = new BugDisplay($bugmanager, $mustache);
 
 $api = Aerys\router()
