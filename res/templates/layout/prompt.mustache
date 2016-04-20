@@ -1,0 +1,27 @@
+{{%BLOCKS}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{{$title}}{{prompt}}{{/title}}</title>
+    <link rel="stylesheet" href="/css/screen.css" media="screen">
+    <link rel="stylesheet" href="/css/prompt.css" media="screen">
+</head>
+<body>
+<div class="prompt">
+    <div class="prompt-box">
+        <div class="prompt-header">
+            {{$header}}<h1>{{prompt}}</h1>{{/header}}
+        </div>
+
+        <div class="prompt-content">
+            {{$content}}{{/content}}
+        </div>
+
+        <div class="prompt-footer">
+            {{$footer}}{{/footer}}
+        </div>
+    </div>
+</div>
+</body>
+</html>

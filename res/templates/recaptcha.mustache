@@ -1,29 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <link rel="stylesheet" href="/screen.css" media="screen">
-</head>
-<body>
-<div class="layout-empty-center">
-    <div class="login">
-        <form class="login-form" action="{{data.action}}" method="POST">
+{{%BLOCKS}}
+{{<layout/prompt}}
+    {{$title}}
+        Confirm you're a human
+    {{/title}}
+
+    {{$header}}
+        <h1>Confirm you're a human</h1>
+    {{/header}}
+
+    {{$content}}
+        <form action="{{data.action}}" method="POST">
             {{#data.error}}
-                <div class="login-error">
+                <div class="prompt-error">
                     {{data.error}}
                 </div>
             {{/data.error}}
-
-            <p>
-                {{#data.reason}}
-                    {{data.reason}}
-                {{/data.reason}}
-            </p>
-
-            <p>
-                Please solve the following captcha to continue.
-            </p>
 
             {{#data.inputs}}
                 <input type="hidden" name="{{name}}" value="{{value}}">
@@ -36,7 +27,7 @@
                     grecaptcha.render("captcha", {
                         sitekey: "{{recaptcha.key}}",
                         theme: "light",
-                        callback: function (response) {
+                        callback: function () {
                             var button = document.getElementById("captcha-continue");
                             button.disabled = false;
                         }
@@ -46,13 +37,15 @@
 
             <script src="https://www.google.com/recaptcha/api.js?onload=recaptcha&render=explicit" async defer></script>
 
-            <div class="login-submit">
-                <button type="submit" id="captcha-continue" class="login-button" disabled>
+            <div class="prompt-submit">
+                <button type="submit" id="captcha-continue" class="prompt-button" disabled>
                     Continue
                 </button>
             </div>
         </form>
-    </div>
-</div>
-</body>
-</html>
+    {{/content}}
+
+    {{$footer}}
+        Please solve the captcha to continue.
+    {{/footer}}
+{{/layout/prompt}}

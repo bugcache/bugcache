@@ -1,25 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <link rel="stylesheet" href="/screen.css" media="screen">
-</head>
-<body>
-<div class="layout-empty-center">
-    <div class="login">
-        <form class="login-form" action="/register" method="POST">
-            <h1>Sign Up</h1>
+{{%BLOCKS}}
+{{<layout/prompt}}
+    {{$title}}
+        Sign Up
+    {{/title}}
 
+    {{$header}}
+        <h1>Sign Up</h1>
+    {{/header}}
+
+    {{$content}}
+        <form action="/register" method="POST">
             {{#data.error}}
                 <div class="login-error">
                     {{data.error}}
                 </div>
             {{/data.error}}
 
-            <div class="login-input">
-                <label class="login-input-label" for="login-username">Username</label>
-                <input id="login-username" type="text" name="username" value="{{data.username}}" {{^data.focusPassword}}autofocus{{/data.focusPassword}}>
+            <div class="prompt-input">
+                <label class="prompt-input-label" for="prompt-username">Username</label>
+                <input id="prompt-username" type="text" name="username" value="{{data.username}}" {{^data.focusPassword}}autofocus{{/data.focusPassword}}>
             </div>
 
             {{#data.selectUsername}}
@@ -30,31 +29,28 @@
                 </script>
             {{/data.selectUsername}}
 
-            <div class="login-input">
-                <label class="login-input-label" for="login-password">Password</label>
-                <input id="login-password" type="password" name="password" {{#data.focusPassword}}autofocus{{/data.focusPassword}}>
+            <div class="prompt-input">
+                <label class="prompt-input-label" for="prompt-password">Password</label>
+                <input id="prompt-password" type="password" name="password" {{#data.focusPassword}}autofocus{{/data.focusPassword}}>
             </div>
 
-            <div class="login-input">
-                <label class="login-input-label" for="login-password-repeat">Repeat Password</label>
-                <input id="login-password-repeat" type="password" name="password-repeat">
+            <div class="prompt-input">
+                <label class="prompt-input-label" for="prompt-password-repeat">Repeat Password</label>
+                <input id="prompt-password-repeat" type="password" name="password-repeat">
             </div>
 
-            <div class="login-submit">
-                <button type="submit" class="login-button">
+            <div class="prompt-submit">
+                <button type="submit" class="prompt-button">
                     Sign Up
                 </button>
             </div>
         </form>
+    {{/content}}
 
-        <div class="login-footer">
-            Already have an account?
-            <br>
-            <a href="/login" class="login-footer-action">
-                Log In
-            </a>
-        </div>
-    </div>
-</div>
-</body>
-</html>
+    {{$footer}}
+        Already have an account? <br/>
+        <a href="/login" class="prompt-footer-action">
+            Log In
+        </a>
+    {{/footer}}
+{{/layout/prompt}}

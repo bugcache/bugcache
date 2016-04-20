@@ -1,40 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <link rel="stylesheet" href="/screen.css" media="screen">
-</head>
-<body>
-<div class="layout-empty-center">
-    <div class="login">
-        <form class="login-form" action="{{data.action}}" method="POST">
+{{%BLOCKS}}
+{{<layout/prompt}}
+    {{$title}}
+        Confirm password
+    {{/title}}
+
+    {{$header}}
+        <h1>Confirm password to continue</h1>
+    {{/header}}
+
+    {{$content}}
+        <form action="{{data.action}}" method="POST">
             {{#data.error}}
-                <div class="login-error">
+                <div class="prompt-error">
                     {{data.error}}
                 </div>
             {{/data.error}}
-
-            <p>
-                Confirm password to continue
-            </p>
 
             {{#data.inputs}}
                 <input type="hidden" name="{{name}}" value="{{value}}">
             {{/data.inputs}}
 
-            <div class="login-input">
-                <label class="login-input-label" for="login-password">Password</label>
-                <input id="login-password" type="password" name="password" autofocus>
+            <div class="prompt-input">
+                <label class="prompt-input-label" for="prompt-password">Password</label>
+                <input id="prompt-password" type="password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" autofocus>
             </div>
 
-            <div class="login-submit">
-                <button type="submit" id="captcha-continue" class="login-button">
+            <div class="prompt-submit">
+                <button type="submit" id="captcha-continue" class="prompt-button">
                     Continue
                 </button>
             </div>
         </form>
-    </div>
-</div>
-</body>
-</html>
+    {{/content}}
+
+    {{$footer}}
+        You are entering <code>sudo</code> mode.
+    {{/footer}}
+{{/layout/prompt}}
