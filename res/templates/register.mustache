@@ -18,7 +18,7 @@
 
             <div class="prompt-input">
                 <label class="prompt-input-label" for="prompt-username">Username</label>
-                <input id="prompt-username" type="text" name="username" value="{{data.username}}" {{^data.focusPassword}}autofocus{{/data.focusPassword}}>
+                <input id="prompt-username" type="text" name="username" placeholder="awesome" value="{{data.username}}" {{^data.focusPassword}}autofocus{{/data.focusPassword}}>
             </div>
 
             {{#data.selectUsername}}
@@ -31,12 +31,12 @@
 
             <div class="prompt-input">
                 <label class="prompt-input-label" for="prompt-password">Password</label>
-                <input id="prompt-password" type="password" name="password" {{#data.focusPassword}}autofocus{{/data.focusPassword}}>
+                <input id="prompt-password" type="password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" {{#data.focusPassword}}autofocus{{/data.focusPassword}}>
             </div>
 
             <div class="prompt-input">
                 <label class="prompt-input-label" for="prompt-password-repeat">Repeat Password</label>
-                <input id="prompt-password-repeat" type="password" name="password-repeat">
+                <input id="prompt-password-repeat" type="password" name="password-repeat" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;">
             </div>
 
             <div class="prompt-submit">
