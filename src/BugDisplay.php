@@ -121,14 +121,16 @@ class BugDisplay {
 				}
 				if (isset($attributes[$attr])) {
 					$field += $attributes[$attr];
-					if (is_array($field["values"] ?? null)) {
-						foreach ($field["values"] as &$value) {
-							$value["default"] = in_array($value["name"], $field["value"]);
-						}
-					} else {
-						foreach ($field["value"] as &$value) {
-							if (isset($value["username"])) {
-								$value["value"] = $value["username"];
+					if ($values) {
+						if (is_array($field["values"] ?? null)) {
+								foreach ($field["values"] as &$value) {
+									$value["default"] = in_array($value["name"], $field["value"]);
+								}
+						} else {
+							foreach ($field["value"] as &$value) {
+								if (isset($value["username"])) {
+									$value["value"] = $value["username"];
+								}
 							}
 						}
 					}
