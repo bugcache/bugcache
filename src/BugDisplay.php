@@ -121,7 +121,7 @@ class BugDisplay {
 				}
 				if (isset($attributes[$attr])) {
 					$field += $attributes[$attr];
-					if ($values) {
+					if ($field["value"] ?? null) {
 						if (is_array($field["values"] ?? null)) {
 								foreach ($field["values"] as &$value) {
 									$value["default"] = in_array($value["name"], $field["value"]);
