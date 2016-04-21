@@ -28,8 +28,9 @@
                             {{#multi}}
                                 <ul>
                                     {{#value}}
-                                        <li><input type="{{type}}" name="{{field}}" value="{{value}}" /> <button type="submit" name="_add" value="{{field}}">+</button></li>
+                                        <li><input type="{{type}}" name="{{field}}" value="{{value}}" /></li>
                                     {{/value}}
+                                    <li><input type="{{type}}" name="{{field}}" /> <button type="submit" name="_add" value="{{field}}">+</button></li>
                                 </ul>
                             {{/multi}}
                             {{^multi}}
