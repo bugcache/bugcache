@@ -77,7 +77,6 @@ $ui = Aerys\router()
             return $headers;
         }
     })
-    ->get("/stop", "Amp\\stop")
 ;
 
 $router = Aerys\router()

@@ -68,7 +68,7 @@ class BugRepository implements \Bugcache\Storage\BugRepository {
 	}
 
 	function fetchBug(int $id): Promise {
-		return $this->fetchObject("SELECT title, data, submitter, name AS submittername FROM bugs JOIN users ON (users.id = submitter) WHERE bugs.id = ?", [$id]);
+		return $this->fetchObject("SELECT title, data, submitter, IF(ISNULL(name), '".addslashes(\Bugcache\ANONYMOUS_USER)."', name) AS submittername FROM bugs LEFT JOIN users ON (users.id = submitter) WHERE bugs.id = ?", [$id]);
 	}
 
 	function fetchAttrs(int $id): Promise {

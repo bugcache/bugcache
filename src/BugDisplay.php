@@ -40,7 +40,7 @@ class BugDisplay {
 	public function displayBug() {
 		return function(Request $req, Response $res, $routerInfo) {
 			$data = yield from $this->manager->fetchBug($req, $routerInfo);
-			if ($data === null) {
+			if ($data === null || isset($data->error)) {
 				$res->setStatus(403);
 				$res->end("Bad request");
 				return;
