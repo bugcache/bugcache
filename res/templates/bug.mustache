@@ -1,16 +1,18 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<title>Bugcache</title>
-	</head>
-	<body>
-		<a href="/recent">Recent bugs</a>
-		<a href="/{{data.id}}/edit">Edit this bug</a>
-		<h2>#{{data.id}} &mdash; {{data.title}}</h2>
-		<div>Submitter: {{data.submittername}}</div>
-		{{#data.attributes}}
-			<div>{{name}}: <ul>{{#value}}<li>{{value}}</li>{{/value}}</ul></div>
-		{{/data.attributes}}
-		{{data.data}}
-	</body>
-</html>
+{{%BLOCKS}}
+{{<layout/main}}
+    {{$content}}
+        <div class="content-block">
+            <h2>#{{data.id}} &mdash; {{data.title}}</h2>
+            <a href="/{{data.id}}/edit">Edit this bug</a>
+
+            <div>Submitter: {{data.submittername}}</div>
+            {{#data.attributes}}
+                <div>{{name}}: <ul>{{#value}}<li>{{value}}</li>{{/value}}</ul></div>
+            {{/data.attributes}}
+
+            <hr/>
+
+            {{data.data}}
+        </div>
+    {{/content}}
+{{/layout/main}}

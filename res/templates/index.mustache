@@ -1,26 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Bugcache</title>
-</head>
-<body>
-    {{#user.id}}
-        Logged in as {{user.name}}.
+{{%BLOCKS}}
+{{<layout/main}}
+    {{$content}}
+        <ul class="list">
+            <li class="list-item">
+                <a href="/recent">List recent bugs</a>
+            </li>
 
-        <form action="/logout" method="POST">
-            <button type="submit">
-                Logout
-            </button>
-        </form>
-    {{/user.id}}
-
-    {{^user.id}}
-        <a href="/login">
-            Login
-        </a>
-    {{/user.id}}
-
-    <a href="/recent">List recent bugs</a>
-    <a href="/new">Report new bug</a>
-</body>
-</html>
+            <li class="list-item">
+                <a href="/new">Report new bug</a>
+            </li>
+        </ul>
+    {{/content}}
+{{/layout/main}}

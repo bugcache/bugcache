@@ -1,0 +1,44 @@
+{{%BLOCKS}}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{$title}}{{title}}{{/title}}</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/screen.css" media="screen">
+    <link rel="stylesheet" href="/css/main.css" media="screen">
+</head>
+<body class="body">
+<div class="header">
+    <div class="header-section">
+        <a href="/" class="header-item">
+            <i class="fa fa-home"></i>
+        </a>
+    </div>
+
+    <div class="header-section">
+        <form action="/search" method="GET" class="header-item">
+            <input name="q" type="text" autocomplete="off" placeholder="Search Bugcache">
+        </form>
+
+        {{#user.id}}
+            <form action="/logout" method="POST">
+                <button class="header-item" type="submit">
+                    <i class="fa fa-sign-out"></i>
+                </button>
+            </form>
+        {{/user.id}}
+
+        {{^user.id}}
+            <a class="header-item" href="/login">
+                <i class="fa fa-sign-in"></i>
+            </a>
+        {{/user.id}}
+    </div>
+</div>
+
+<div class="content">
+    {{$content}}{{/content}}
+</div>
+</body>
+</html>

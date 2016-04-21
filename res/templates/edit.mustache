@@ -1,40 +1,53 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<title>Bugcache</title>
-	</head>
-	<body>
-		<form action="" method="post">
-			{{#data.id}}
-				Edit bug <a href="/{{data.id}}">#{{data.id}}</a>:
-			{{/data.id}}
-			{{^data.id}}
-				Report a bug:
-			{{/data.id}}
-			<div>Title: <input type="text" name="title" value="{{data.title}}" /></div>
-			{{#data.attributes}}
-				<div>{{name}}:
-					{{#values.0}}
-						<select name="{{field}}">
-							{{#values}}
-								<option {{#default}}selected="selected"{{/default}}>{{name}}</option>
-							{{/values}}
-						</select>
-					{{/values.0}}
-					{{^values.0}}
-						<ul>
-							{{#value}}
-								<li><input type="{{type}}" name="{{field}}" value="{{value}}" /></li>
-							{{/value}}
-							{{#multi}}
-								<li><input type="{{type}}" name="{{field}}" /> <button type="submit" name="_add" value="{{field}}">+</button></li>
-							{{/multi}}
-						</ul>
-					{{/values.0}}
-				</div>
-			{{/data.attributes}}
-			<textarea name="data">{{data.data}}</textarea><br>
-			<input type="submit" value="Report" />
-		</form>
-	</body>
-</html>
+{{%BLOCKS}}
+{{<layout/main}}
+    {{$content}}
+        <div class="content-block">
+            {{#data.id}}
+                <h2>Edit of bug <a href="/{{data.id}}">#{{data.id}}</a></h2>
+            {{/data.id}}
+            {{^data.id}}
+                <h2>Report a bug</h2>
+            {{/data.id}}
+
+            <form action="" method="POST">
+                <div class="form-input">
+                    <label class="form-input-label">Title</label>
+                    <input type="text" name="title" value="{{data.title}}" />
+                </div>
+
+                {{#data.attributes}}
+                    <div>{{name}}:
+                        {{#values.0}}
+                            <select name="{{field}}">
+                                {{#values}}
+                                    <option {{#default}}selected="selected"{{/default}}>{{name}}</option>
+                                {{/values}}
+                            </select>
+                        {{/values.0}}
+                        {{^values.0}}
+                            <ul>
+                                {{#value}}
+                                    <li><input type="{{type}}" name="{{field}}" value="{{value}}" /></li>
+                                {{/value}}
+                                {{#multi}}
+                                    <li><input type="{{type}}" name="{{field}}" /> <button type="submit" name="_add" value="{{field}}">+</button></li>
+                                {{/multi}}
+                            </ul>
+                        {{/values.0}}
+                    </div>
+                {{/data.attributes}}
+
+                <div class="form-input">
+                    <label class="form-input-label">Description</label>
+                    <textarea name="data">{{data.data}}</textarea><br>
+                </div>
+
+                <div class="form-submit">
+                    <button type="submit" class="form-button">
+                        Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    {{/content}}
+{{/layout/main}}
